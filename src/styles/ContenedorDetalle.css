@@ -1,0 +1,19 @@
+.contenedor-detalle-container{
+    background: rgb(206, 206, 206);
+    margin: 10px 25px 10px 25px;
+    border-radius: 10px;
+    height: auto;
+    padding: 10px;
+}
+table, th, td {
+    border: 1px solid black;
+  }
+.encabezados-container{
+    display: flex;
+    justify-content: space-between;
+}
+.productos-lista{
+    background-color: white;
+    border-radius: 10px;
+    border: 1px solid black;
+}
