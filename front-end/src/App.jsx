@@ -8,23 +8,29 @@ import ListaProductos from "./pages/ListaProductos.jsx";
 import ProductoDetalle from "./pages/ProductoDetalle.jsx";
 import AgregarItem from "./pages/AgregarItem.jsx";
 
-
+import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
+import { useUserContext } from "./UserProvider.jsx";
 function App() {
-
+  const { user } = useUserContext();
 
   return (
 
      
       <Router>
-        <Navegador />
+        {
+          user ? <Navegador /> : <></>
+        }
+        
         <Routes>
           <Route path='/' element={<Login />} />
-          <Route path='/contenedores' element={<Contenedores />} />
-          <Route path='/contenedor-detalle' element={<ContendorDetalle />}/>
-          <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
-          <Route path='/lista-productos' element={<ListaProductos />} />
-          <Route path='/producto-detalle' element={<ProductoDetalle />} />
-          <Route path='/agregar-item/:item' element={<AgregarItem />} />
+          <Route element={<ProtectedRoute isAllowed={user} />}>
+            <Route path='/contenedores' element={<Contenedores />} />
+            <Route path='/contenedor-detalle' element={<ContendorDetalle />}/>
+            <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
+            <Route path='/lista-productos' element={<ListaProductos />} />
+            <Route path='/producto-detalle' element={<ProductoDetalle />} />
+            <Route path='/agregar-item/:item' element={<AgregarItem />} />
+          </Route>   
         </Routes>
       </Router>
 

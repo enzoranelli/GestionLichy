@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import '../styles/Navegador.css';
 import { useState } from "react";
-
+import { useUserToggleContext } from "../UserProvider";
 function Navegador(){
+    const { logout } = useUserToggleContext();
     const navigate = useNavigate();
     const redirigir = (link) =>{
       navigate(link)
@@ -16,9 +17,7 @@ function Navegador(){
       <div className='contenedor-navegador'>
           <nav style={{display:"flex",listStyleType:"none", marginRight: "20px", alignItems:'center', height:'100%'}}>
           <ul style={{display:"flex",listStyleType:"none",padding:0,margin:0}}>
-            <li style={{marginRight: "20px"}}>
-              <button className='boton-navegador' onClick={()=>redirigir('/')}>Login</button>
-            </li>
+            
             <li style={{marginRight: "20px"}}>
               <button className='boton-navegador' onClick={()=>redirigir('/contenedores')}>Contenedores</button>
             </li>
@@ -55,7 +54,7 @@ function Navegador(){
             
           </ul>
         </nav>
-        <button className="boton-navegador" onClick={()=>redirigir('/')}>Cerrar sesion</button>
+        <button className="boton-navegador" onClick={logout}>Cerrar sesion</button>
       </div>
   );
 }
