@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import '../styles/Navegador.css';
 import { useState } from "react";
 import { useUserToggleContext } from "../UserProvider";
-function Navegador(){
+function Navegador({user}){
     const { logout } = useUserToggleContext();
     const navigate = useNavigate();
     const redirigir = (link) =>{
@@ -21,7 +21,9 @@ function Navegador(){
             <li style={{marginRight: "20px"}}>
               <button className='boton-navegador' onClick={()=>redirigir('/contenedores')}>Contenedores</button>
             </li>
-            <li style={{marginRight: "20px"}}>
+            {
+              user.tipoUsuario === 'admin' || user.tipoUsuario === 'status' ? <>
+              <li style={{marginRight: "20px"}}>
               <button className='boton-navegador' onClick={()=>redirigir('/nuevo-contenedor')}>Agregar Contenedor</button>
             </li>
             <li style={{marginRight: "20px"}}>
@@ -51,6 +53,9 @@ function Navegador(){
                 </ul>
               )}
             </li>
+              </>:<></>
+            }
+            
             
           </ul>
         </nav>

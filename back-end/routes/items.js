@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/dbconfig');
+
 router.get('/proveedor',obtenerProveedores);
 router.post('/proveedor',agregarProveedor);
 router.get('/color',obtenerColores);
 router.post('/color',agregarColor);
 router.get('/producto',obtenerProductos);
 router.post('/producto',agregarProducto);
+router.get('/categorias',obtenerCategorias);
 
 
 async function obtenerProveedores(req,res){
@@ -96,5 +98,17 @@ async function agregarProducto(req,res){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }
+}
+async function obtenerCategorias(req,res) {
+    try {
+        const query = `
+        SELECT * FROM estados;`;
+        const [results] = await pool.promise().query(query);
+        res.json(results);
+    } catch (error) {
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+    
 }
 module.exports = router;

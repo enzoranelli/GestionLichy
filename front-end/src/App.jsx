@@ -18,19 +18,27 @@ function App() {
      
       <Router>
         {
-          user ? <Navegador /> : <></>
+          user ? 
+          <>
+            <Navegador user={user}/>
+
+          </> : <></>
         }
         
         <Routes>
           <Route path='/' element={<Login />} />
-          <Route element={<ProtectedRoute isAllowed={user} />}>
-            <Route path='/contenedores' element={<Contenedores />} />
-            <Route path='/contenedor-detalle' element={<ContendorDetalle />}/>
+          <Route element={<ProtectedRoute roles={['admin','flujo','status']} isAllowed={user} />}>
+            <Route path='/contenedores'  element={<Contenedores />} />
+            <Route path='/contenedor-detalle/:id' element={<ContendorDetalle />}/>
+           
+          </Route> 
+          <Route element={<ProtectedRoute roles={['admin','status']} isAllowed={user} />}>
             <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
             <Route path='/lista-productos' element={<ListaProductos />} />
             <Route path='/producto-detalle' element={<ProductoDetalle />} />
             <Route path='/agregar-item/:item' element={<AgregarItem />} />
-          </Route>   
+          </Route>
+          <Route path='*' element={<h1>Not Found</h1>} />  
         </Routes>
       </Router>
 

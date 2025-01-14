@@ -25,6 +25,7 @@ CREATE TABLE Contenedor(
     codigoContenedor VARCHAR(100),
     forwarder VARCHAR(100),
     sira VARCHAR(100),
+    factura varchar(100),
     vep VARCHAR(100),
     PRIMARY KEY(idContenedor),
     FOREIGN KEY(proveedor) REFERENCES Proveedor(idProveedor)
@@ -41,14 +42,18 @@ CREATE TABLE Color(
     nombre VARCHAR(100),
     PRIMARY KEY(idColor)
 );
-
+CREATE TABLE estados(
+	nombreEstado VARCHAR(100),
+    PRIMARY KEY(nombreEstado)
+);
 CREATE TABLE ContenedorEstado(
 	idEstado INT AUTO_INCREMENT,
     contenedor INT,
     estado VARCHAR(100),
     ubicacion VARCHAR(200),
     PRIMARY KEY(idEstado),
-    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor)
+    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor),
+    FOREIGN KEY(estado) REFERENCES estados(nombreEstado)
 );
 
 CREATE TABLE ContenedorProductos(
@@ -63,3 +68,4 @@ CREATE TABLE ContenedorProductos(
     FOREIGN KEY(producto) REFERENCES Producto(idProducto),
     FOREIGN KEY(color) REFERENCES Color(idColor)
 );
+

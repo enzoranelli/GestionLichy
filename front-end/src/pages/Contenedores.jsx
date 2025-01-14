@@ -1,43 +1,55 @@
-
 import Contenedor from "../components/Contenedor";
 import '../styles/Contenedores.css';
+import NoItems from "../components/NoItems";
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { use } from "react";
 function Contenedores(){
     const [data,setData]=useState([]);
+    const [dataFiltrado, setDataFiltrado] = useState([]);
+    const [categorias, setCategorias]  = useState([]);
     const [categoria, setCategoria]  = useState('Todos');
     const handleCategoriaChange = (e) => {
         setCategoria(e.target.value); 
     };
+    
     useEffect(()=>{
-        if(categoria === 'Todos'){
-            const array = [{idContenedor:24191, status:'LATA-VACIO 07/12', proveedor:'LOTUS'},
-                {idContenedor:24147, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24148, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24149, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24150, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24151, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24152, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24153, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:24154, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'}]
+        /*
+        Liberadas total
+        con sita
+        garantia
+        bas
+        conteo pendiente    
+        coordinado
+        por coordinar
+        por oficializar
+        fiscal
+        arribado
+        llegando
+        sin boocking
 
-            setData(array) 
+        */
+        if(categoria === 'Todos'){
+            setDataFiltrado(data);
+        }else{
+            const filtrado = data.filter((item)=> item.categoria === categoria);
+            setDataFiltrado(filtrado);
         }
-        if(categoria === 'Fiscal'){
-            const array = [{idContenedor:1, status:'LATA-VACIO 07/12', proveedor:'LOTUS'},
-                {idContenedor:2, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'}]
-            setData(array) 
-        }
-        if(categoria === 'Liberadas total'){
-            const array = [{idContenedor:1, status:'LATA-VACIO 07/12', proveedor:'LOTUS'},
-                {idContenedor:2, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'},
-                {idContenedor:3, status:'LATA-VACIO 13/12', proveedor:'LN GROUP'}]
-            setData(array) 
-        }
-        if(categoria === 'Llegando'){
-            const array = [{idContenedor:1, status:'9/12', proveedor:'LOTUS'},]
-            setData(array)
-        }
+       
     },[categoria]);
+    useEffect(()=>{
+        axios.get('http://localhost:3000/api/contenedores/contenedorEstado').then((response)=>{
+            setData(response.data);
+            setDataFiltrado(response.data);
+        }).catch((error)=>{
+            console.error('Error trayendo los contenedores:', error);
+        });
+        axios.get('http://localhost:3000/api/items/categorias').then((response)=>{
+            setCategorias(response.data);
+        }).catch((error)=>{ console.error('Error trayendo las categorias:', error);
+        });
+    },[]);
+    
     return(
         <div className='contenedores-container'>
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
@@ -45,9 +57,11 @@ function Contenedores(){
                 <label>Categorias :  
                 <select  value={categoria} onChange={handleCategoriaChange}>
                     <option value="Todos">Todos</option>
-                    <option value="Liberadas total">Liberadas total</option>
-                    <option value="Fiscal">Fiscal</option>
-                    <option value="Llegando">Llegando</option>
+                    {categorias.map((cat, index) => (
+                        <option key={index} value={cat.nombreEstado}>
+                        {cat.nombreEstado}
+                        </option>
+                    ))}
                 </select>
                 </label>
             </div>
@@ -59,10 +73,12 @@ function Contenedores(){
                     placeholder="Buscar por id"
                 />
             </div>
+            {
+                dataFiltrado.length === 0 ? <NoItems nombre='contenedores' /> : dataFiltrado.map((item)=> (
+                    <Contenedor data={item} estado={categoria} />
+                ))
+            }
             
-            {data.map((item)=> (
-                <Contenedor data={item} />
-            ))}
             
         </div>
     );

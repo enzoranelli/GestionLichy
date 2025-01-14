@@ -15,6 +15,7 @@ function Login(){
         await login(email, contrasena);
     };
     if(user){
+        
         return <Navigate to='/contenedores' />;
     }
     return(
