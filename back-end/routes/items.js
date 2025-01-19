@@ -33,7 +33,14 @@ async function agregarProveedor(req,res){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
-            res.json(results);
+            const insertId = results.insertId;
+            connection.query('SELECT * FROM proveedor WHERE idProveedor = ?',[insertId],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                res.json(results);
+            });
         });
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
@@ -63,7 +70,14 @@ async function agregarColor(req,res){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
-            res.json(results);
+            const insertId = results.insertId;
+            connection.query('SELECT * FROM color WHERE idColor = ?',[insertId],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                res.json(results);
+            });
         });
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
@@ -92,7 +106,14 @@ async function agregarProducto(req,res){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
-            res.json(results);
+            const insertId = results.insertId;
+            connection.query('SELECT * FROM producto WHERE idProducto = ?',[insertId],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                res.json(results);
+            });
         });
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
@@ -102,7 +123,7 @@ async function agregarProducto(req,res){
 async function obtenerCategorias(req,res) {
     try {
         const query = `
-        SELECT * FROM estados;`;
+        SELECT * FROM categorias;`;
         const [results] = await pool.promise().query(query);
         res.json(results);
     } catch (error) {

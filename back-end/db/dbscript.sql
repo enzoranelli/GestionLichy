@@ -16,6 +16,22 @@ CREATE TABLE Proveedor(
     PRIMARY KEY(idProveedor)
 );
 
+CREATE TABLE Producto(
+	idProducto INT AUTO_INCREMENT,
+    nombre VARCHAR(200),
+    PRIMARY KEY(idProducto)
+);
+
+CREATE TABLE Color(
+	idColor INT AUTO_INCREMENT,
+    nombre VARCHAR(100),
+    PRIMARY KEY(idColor)
+);
+CREATE TABLE categorias(
+	nombreCategoria VARCHAR(100),
+    PRIMARY KEY(nombreCategoria)
+);
+
 CREATE TABLE Contenedor(
 	idContenedor INT,
     categoria VARCHAR(100),
@@ -28,32 +44,17 @@ CREATE TABLE Contenedor(
     factura varchar(100),
     vep VARCHAR(100),
     PRIMARY KEY(idContenedor),
-    FOREIGN KEY(proveedor) REFERENCES Proveedor(idProveedor)
+    FOREIGN KEY(proveedor) REFERENCES Proveedor(idProveedor),
+    FOREIGN KEY(categoria) REFERENCES categorias(nombreCategoria)
 );
 
-CREATE TABLE Producto(
-	idProducto INT AUTO_INCREMENT,
-    nombre VARCHAR(200),
-    PRIMARY KEY(idProducto)
-);
-
-CREATE TABLE Color(
-	idColor INT AUTO_INCREMENT,
-    nombre VARCHAR(100),
-    PRIMARY KEY(idColor)
-);
-CREATE TABLE estados(
-	nombreEstado VARCHAR(100),
-    PRIMARY KEY(nombreEstado)
-);
 CREATE TABLE ContenedorEstado(
 	idEstado INT AUTO_INCREMENT,
     contenedor INT,
     estado VARCHAR(100),
     ubicacion VARCHAR(200),
     PRIMARY KEY(idEstado),
-    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor),
-    FOREIGN KEY(estado) REFERENCES estados(nombreEstado)
+    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor)
 );
 
 CREATE TABLE ContenedorProductos(
@@ -69,3 +70,13 @@ CREATE TABLE ContenedorProductos(
     FOREIGN KEY(color) REFERENCES Color(idColor)
 );
 
+DROP TABLE ContenedorProductos;
+DROP TABLE ContenedorEstado;
+DROP TABLE estados;
+
+DROP TABLE contenedor;
+DROP TABLE proveedor;
+DROP TABLE producto;
+DROP TABLE color;
+
+DROP TABLE usuario;

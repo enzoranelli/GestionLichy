@@ -8,7 +8,6 @@ function Contenedor({data, estado}){
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                 <h2 className='titulo'> Interno {data.idContenedor}</h2>
                 <label> Estado: <b>{data.estado ? data.estado : 'Sin estado'}</b></label>
-                <label> Proveedor: <b>{data.nombre}</b></label>
                 <label> Ubicacion: <b>{data.ubicacion ? data.ubicacion : 'Sin ubicacion'}</b></label>
                 {
                     estado === 'Todos' ? <label> Categoria: <b>{data.categoria ? data.categoria : 'Sin categoria'}</b></label> : null

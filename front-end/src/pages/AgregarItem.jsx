@@ -1,18 +1,50 @@
 import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import '../styles/AgregarItem.css'
 function AgregarItem(){
     const {item} = useParams();
+    const [items, setItems] = useState([]);
+    const [nombre, setNombre] = useState('');
+    
+    useEffect(()=>{
+        axios.get(`http://localhost:3000/api/items/${item}`).then((response)=>{
+            setItems(response.data);
+        }).catch((error)=>{
+            console.error('Error trayendo los items:', error);
+        });
+    },[item]);
+
+    const handleSubmit = (e) =>{
+        e.preventDefault();
+        axios.post(`http://localhost:3000/api/items/${item}`,{nombre}).then((response)=>{
+            if(response.status === 200){
+                console.log(response.data);
+                setNombre('');
+                setItems( [...items, response.data[0]]);
+            }
+        }).catch((error)=>{
+            console.error('Error agregando el item:', error);
+        });
+    };
     return(
 
         <div className="principal-container">
-            <div className="agregar-container">
+            <form className="agregar-container" onSubmit={handleSubmit}>
                 <h2 className="titulo">Agregar {item}</h2>
-                <input style={{width:'100%'}} type="text" placeholder={`Nombre de ${item}`}  />
+                <input style={{width:'100%'}} type="text" placeholder={`Nombre de ${item}`}  value={nombre} onChange={(e) => setNombre(e.target.value)}/>
                 <br></br>
                 <button >Agregar</button>
-            </div>
+            </form>
             <div className="lista-item-container">
                 <h2 className="titulo">Lista de {item}:</h2>
+                <ul>
+                    {
+                        items.map((item)=>{
+                            return <li>{item.nombre}</li>
+                        })
+                    }
+                </ul>
             </div>
             
         </div>

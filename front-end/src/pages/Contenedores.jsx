@@ -38,14 +38,16 @@ function Contenedores(){
        
     },[categoria]);
     useEffect(()=>{
-        axios.get('http://localhost:3000/api/contenedores/contenedorEstado').then((response)=>{
+        axios.get('http://localhost:3000/api/contenedores/').then((response)=>{
             setData(response.data);
             setDataFiltrado(response.data);
         }).catch((error)=>{
             console.error('Error trayendo los contenedores:', error);
         });
         axios.get('http://localhost:3000/api/items/categorias').then((response)=>{
+            console.log(response.data);
             setCategorias(response.data);
+
         }).catch((error)=>{ console.error('Error trayendo las categorias:', error);
         });
     },[]);
@@ -58,8 +60,8 @@ function Contenedores(){
                 <select  value={categoria} onChange={handleCategoriaChange}>
                     <option value="Todos">Todos</option>
                     {categorias.map((cat, index) => (
-                        <option key={index} value={cat.nombreEstado}>
-                        {cat.nombreEstado}
+                        <option key={index} value={cat.nombreCategoria}>
+                        {cat.nombreCategoria}
                         </option>
                     ))}
                 </select>

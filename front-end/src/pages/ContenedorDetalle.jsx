@@ -1,35 +1,39 @@
 import Producto from '../components/Producto';
 import '../styles/ContenedorDetalle.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 function ContendorDetalle(){
     const navigate = useNavigate();
     const redirigir = ()=>{
         navigate('/contenedores');
     }
-    const data ={idContenedor:24191, factura:'BLD24WU096',status:'LATA-VACIO 07/12', proveedor:'LOTUS', producto:'BENGALINA / LICHY',
-        lugar:'EVER FASHION', forwarder:'NB241050560',
-    }
-    const productos = [{
-        nombre: 'CORDERITO SIMPLE',
-        color: 'placeholder',
-        cantidad: 1
-    },
-    {
-        nombre: 'FLANEL PRINT',
-        color: 'placeholder',
-        cantidad: 1
-    },
-    {
-        nombre: 'TIMBERLAND',
-        color: 'placeholder',
-        cantidad: 1
-    },]
+    const [productos, setProductos] = useState([]);
+    const [data, setData]= useState(null);
+    const [historial, setHistorial] = useState([]);
+    const {id} = useParams();
+    useEffect(()=>{
+        console.log(id)
+        axios.get(`http://localhost:3000/api/contenedores/contenedor-detalle/${id}`).then((response)=>{
+            setData(response.data[0]);
+            console.log(response.data);
+        });
+        axios.get(`http://localhost:3000/api/contenedorEstado/${id}`).then((response)=>{
+            setHistorial(response.data);
+        });
+        axios.get(`http://localhost:3000/api/contenedorProducto/${id}`).then((response)=>{
+            setProductos(response.data);
+        });
 
+    },[]);
     return(
 
         <div className="contenedor-detalle-container">
             <div className='encabezados-container'>
-                <h1 className='titulo' >Interno: {data.idContenedor}</h1>
+                {
+                    data ? <h1 className='titulo' >Interno: {data.idContenedor}</h1>:<></>
+                }
+                
                 <div className='contenedor-botones'>
                     <button >Actualizar estado</button>
                     <button onClick={redirigir}>Volver</button>
@@ -40,27 +44,26 @@ function ContendorDetalle(){
             
             <hr></hr>
             <div className='encabezados-container'>
-                <h1 className='titulo'>Estado: Arribando en 13/10</h1>
-                <h1 className='titulo'>Ubicación: LOGISTICA CENTRAL 3/12</h1>
+                <h1 className='titulo'>Estado: {historial ? historial[0].estado : 'Sin estado'}</h1>
+                <h1 className='titulo'>Ubicación: {historial ? historial[0].ubicacion : 'Sin ubicacion'}</h1>
             </div>
             <h3>Estados anteriores:</h3>
             <table style={{width:'40%', background:'white',marginBottom:'20px'}}>
+                
                 <tr style={{width:'40%', background:'gray'}}>
                     <th>Estado</th>
-                    <th>Ubicación</th>
-                    <th>Fecha</th>
-                    
+                    <th>Ubicación</th>          
                 </tr>
-                <tr>
-                    <th>Llgando</th>
-                    <th>Placeholder</th>
-                    <th>20/09/24</th>
-                </tr>
-                <tr>
-                    <th>Sin boocking</th>
-                    <th>Placeholder</th>
-                    <th>12/09/24</th>
-                </tr>
+                {
+                    historial ? historial.map((item)=>(
+                        <tr>
+                            <th>{item.estado}</th>
+                            <th>{item.ubicacion}</th>
+                            
+                        </tr>
+                    )):<></>
+                }
+                
             </table>
             <h3 className='titulo'>Comentario</h3>
                 <label>DASSA - COSCO SHIPPING RHINE - TRP (19/11) - FORZ 27/11 - TLAT 25/11 - VACIO ?</label>
@@ -72,9 +75,9 @@ function ContendorDetalle(){
             </div>
             <div className='productos-lista'>
             {
-                productos.map((item)=> (
+                productos ? productos.map((item)=> (
                     <Producto data={item} />
-                ))
+                )) : <></>
             }
             </div>
         </div>

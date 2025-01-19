@@ -4,7 +4,6 @@ const pool = require('../db/dbconfig');
 
 router.get('/',obtenerContenedores);
 router.post('/', agregarContenedor);
-router.get('/contenedorEstado',obtenerContenedorEstado);
 router.get('/contenedor-detalle/:id',obtenerContenedorDetalle);
 async function obtenerContenedores(req,res){
     try {
@@ -19,10 +18,10 @@ async function obtenerContenedores(req,res){
 async function agregarContenedor(req,res){
     try{
 
-        const {idContenedor, usuario, proveedor,categoria,factura, codigoContenedor, forwarder,sira,vep} = req.body;
+        const {idContenedor, usuario,producto, proveedor,categoria,factura, codigoContenedor, forwarder,sira,vep} = req.body;
         const connection = pool;
         console.log(req.body);
-        if(!idContenedor || !usuario || !proveedor){    
+        if(!idContenedor || !usuario || !proveedor || !producto){    
             return res.status(400).send('Faltan campos obligatorios');
         }
         connection.query('INSERT INTO Contenedor (idContenedor, usuario, proveedor,categoria,factura, codigoContenedor, forwarder,sira,vep) VALUES (?,?,?,?,?,?,?,?,?)',[idContenedor, usuario, proveedor,categoria,factura, codigoContenedor, forwarder,sira,vep],(err,results)=>{
@@ -30,7 +29,14 @@ async function agregarContenedor(req,res){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
-            res.json(results);
+           
+            connection.query('INSERT INTO contenedorproductos (contenedor,producto) VALUES (?,?)',[idContenedor, producto],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                res.json(results);
+            });
         });
         
     }catch(error){
@@ -38,12 +44,21 @@ async function agregarContenedor(req,res){
         return res.status(500).send('Error en el servidor.');
     }
 }
-async function obtenerContenedorEstado(req,res) {
+async function obtenerContenedores(req,res) {
     try {
         const query = `
-        SELECT  c.idContenedor,c.categoria,p.nombre,ce.idEstado,ce.estado,ce.ubicacion
-        FROM Contenedor c LEFT JOIN ContenedorEstado ce ON c.idContenedor = ce.contenedor
-        INNER JOIN Proveedor p ON p.idProveedor = c.proveedor;  `;
+        SELECT 
+            c.idContenedor,
+            c.categoria,
+            ce.idEstado,
+            ce.estado,
+            ce.ubicacion
+        FROM Contenedor c LEFT JOIN 
+        (SELECT ce1.* FROM ContenedorEstado ce1 INNER JOIN 
+            (SELECT contenedor, MAX(idEstado) AS maxIdEstado FROM ContenedorEstado
+            GROUP BY contenedor) ce2 ON ce1.contenedor = ce2.contenedor 
+            AND ce1.idEstado = ce2.maxIdEstado) ce ON c.idContenedor = ce.contenedor
+        GROUP BY c.idContenedor;`;
         const [results] = await pool.promise().query(query, [req.params.estado]);
         res.json(results);
     } catch (error) {
@@ -67,4 +82,6 @@ async function obtenerContenedorDetalle(req,res){
         return res.status(500).send('Error en el servidor.');
     }
 }
+
+
 module.exports = router;
