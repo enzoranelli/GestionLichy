@@ -53,6 +53,7 @@ CREATE TABLE ContenedorEstado(
     contenedor INT,
     estado VARCHAR(100),
     ubicacion VARCHAR(200),
+    fechaHora DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(idEstado),
     FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor)
 );

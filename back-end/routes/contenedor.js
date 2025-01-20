@@ -5,6 +5,7 @@ const pool = require('../db/dbconfig');
 router.get('/',obtenerContenedores);
 router.post('/', agregarContenedor);
 router.get('/contenedor-detalle/:id',obtenerContenedorDetalle);
+router.put('/categoria/:id',actualizarContenedorCategoria);
 async function obtenerContenedores(req,res){
     try {
         const [results] = await pool.promise().query('SELECT * FROM contenedor');
@@ -72,12 +73,29 @@ async function obtenerContenedorDetalle(req,res){
         const id = req.params.id;
         const query = `
         SELECT  *
-        FROM Contenedor c LEFT JOIN ContenedorEstado ce ON c.idContenedor = ce.contenedor
+        FROM Contenedor c 
         INNER JOIN Proveedor p ON p.idProveedor = c.proveedor
         WHERE idContenedor = ?;  `;
         const [results] = await pool.promise().query(query, [id]);
         res.json(results);
     } catch (error) {
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+
+async function actualizarContenedorCategoria(req,res){
+    try{
+        const id = req.params.id;
+        const categoria = req.body.categoria;
+        if(!categoria){
+            return res.status(400).send('Faltan campos obligatorios');
+        }
+        const query = 'UPDATE Contenedor SET categoria = ? WHERE idContenedor = ?';
+        const [results] = await pool.promise().query(query, [categoria, id]);
+        const [results2] = await pool.promise().query('SELECT categoria FROM Contenedor WHERE idContenedor = ?',[id]);
+        res.json(results2);
+    }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }
