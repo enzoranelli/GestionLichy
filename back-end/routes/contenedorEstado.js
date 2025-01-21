@@ -25,8 +25,15 @@ async function agregarContenedorEstado(req,res){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
-            res.json(results);
+            connection.query('SELECT * FROM ContenedorEstado WHERE contenedor = ? ORDER BY idEstado Desc',[contenedor],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                res.json(results);
+            });
         });
+        
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');

@@ -4,11 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import ActualizarCategoria from '../components/ActualizarCategoria';
+import ActualizarEstado from '../components/ActualizarEstado';
 function ContendorDetalle(){
     const navigate = useNavigate();
     const redirigir = ()=>{
         navigate('/contenedores');
     }
+    const [mostrarActualizarEstado, setMostrarActualizarEstado] = useState(false);
     const [mostrarActualizarCategoria, setMostrarActualizarCategoria] = useState(false);
     const [productos, setProductos] = useState([]);
     const [data, setData]= useState(null);
@@ -17,6 +19,13 @@ function ContendorDetalle(){
 
     const actualizarCategoria = ()=>{
         setMostrarActualizarCategoria(true);
+    };
+    const actualizarEstado = ()=>{
+        if(mostrarActualizarEstado){
+            setMostrarActualizarEstado(false)
+        }else{
+            setMostrarActualizarEstado(true);
+        }
     };
     useEffect(()=>{
         console.log(id)
@@ -72,12 +81,14 @@ function ContendorDetalle(){
             <div className='encabezados-container'>
                 <h1 className='titulo'>Estado: {historial && historial[0] ? historial[0].estado : 'Sin estado'}</h1>
                 <h1 className='titulo'>Ubicación: {historial && historial[0] ? historial[0].ubicacion : 'Sin ubicacion'}</h1>
-                <button>Editar</button>
+                {
+                    mostrarActualizarEstado ? <button onClick={actualizarEstado}>Cancelar</button> : <button onClick={actualizarEstado}>Agregar nuevo estado</button>
+                }
             </div>
             
             <h3>Estados anteriores:</h3>
                 
-           
+           <div className='historial-form-container'>
            
             <table style={{width:'40%', background:'white',marginBottom:'20px'}}>
                 
@@ -86,20 +97,27 @@ function ContendorDetalle(){
                     <th>Ubicación</th>          
                 </tr>
                 {
-                    historial ? historial.map((item)=>(
+                    historial && historial.length > 1 ? historial.map((item)=>(
                         <tr>
                             <th>{item.estado}</th>
                             <th>{item.ubicacion}</th>
                             
                         </tr>
-                    )):<></>
+                    )):<>
+                        <th>No hay estados anteriores</th>
+                    
+                    </>
                 }
-           
+        
             </table>
+            {
+                mostrarActualizarEstado ? <ActualizarEstado setHistorial={setHistorial} contenedor={id} actualizarEstado={actualizarEstado}/> : <></>
+            }
+            </div>
             <hr></hr>
             <div className='encabezados-container'>
                 <h2>Detalles</h2>
-                <button>Editar</button>
+                <button>Editar detalles</button>
             </div>
             
             {

@@ -31,7 +31,7 @@ function Navegador({user}){
             </li>
             <li style={{ marginRight: "20px", position: "relative" }}>
               <button className="boton-navegador" onClick={toggleDropdown}>
-                Configuración
+                Configuración de items
               </button>
               {isDropdownOpen && (
                 <ul className="dropdown-menu">
@@ -53,9 +53,17 @@ function Navegador({user}){
                 </ul>
               )}
             </li>
+            
               </>:<></>
             }
-            
+            {
+              user.tipoUsuario === 'admin' ? <>
+              <li style={{marginRight: "20px"}}>
+              <button className='boton-navegador' onClick={()=>redirigir('/configuracion-usuarios')}>Configuración de usuarios</button> 
+              </li>
+              </>:
+              <></>
+            }            
             
           </ul>
         </nav>

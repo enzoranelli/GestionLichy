@@ -16,6 +16,11 @@ table, th, td {
     display: flex;
     justify-content: space-between;
 }
+.historial-form-container{
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+}
 .productos-lista{
     background-color: white;
     border-radius: 10px;
