@@ -6,6 +6,7 @@ router.get('/',obtenerContenedores);
 router.post('/', agregarContenedor);
 router.get('/contenedor-detalle/:id',obtenerContenedorDetalle);
 router.put('/categoria/:id',actualizarContenedorCategoria);
+router.put('/detalle/:id',actualizarDetalleContenedor);
 async function obtenerContenedores(req,res){
     try {
         const [results] = await pool.promise().query('SELECT * FROM contenedor');
@@ -100,6 +101,39 @@ async function actualizarContenedorCategoria(req,res){
         return res.status(500).send('Error en el servidor.');
     }
 }
+async function actualizarDetalleContenedor(req,res){
+    try{
+        const id = req.params.id;
+        const {proveedor,factura,forwarder,comentario,sira,vep,codigoContenedor} = req.body;
+        const connection = pool;
+        const query = `UPDATE Contenedor SET 
+        proveedor = ?,
+        factura = ?,
+        forwarder = ?,
+        comentario = ?,
+        sira = ?,
+        vep = ?,
+        codigoContenedor = ?
+        WHERE idContenedor = ?`
+        connection.query(query,[proveedor,factura,forwarder,comentario,sira,vep,codigoContenedor,id],(err,results)=>{
+            if(err){
+                console.error('Error ejecutando la consulta:', err);
+                return res.status(500).send('Error en el servidor.');
+            }
+            connection.query('SELECT  * FROM Contenedor c INNER JOIN Proveedor p ON p.idProveedor = c.proveedor WHERE idContenedor = ?; ',[id],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                res.json(results)
+            })
+        })
 
+
+    }catch(error){
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
 
 module.exports = router;

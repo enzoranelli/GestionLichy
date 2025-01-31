@@ -9,38 +9,30 @@ function Contenedores(){
     const [dataFiltrado, setDataFiltrado] = useState([]);
     const [categorias, setCategorias]  = useState([]);
     const [categoria, setCategoria]  = useState('Todos');
+    const [busqueda, setBusqueda] = useState('');
+    const [cargando, setCargando] = useState(true);
+
     const handleCategoriaChange = (e) => {
         setCategoria(e.target.value); 
     };
     
     useEffect(()=>{
-        /*
-        Liberadas total
-        con sita
-        garantia
-        bas
-        conteo pendiente    
-        coordinado
-        por coordinar
-        por oficializar
-        fiscal
-        arribado
-        llegando
-        sin boocking
-
-        */
-        if(categoria === 'Todos'){
-            setDataFiltrado(data);
-        }else{
-            const filtrado = data.filter((item)=> item.categoria === categoria);
-            setDataFiltrado(filtrado);
+        let filtrado = data;
+        if(categoria !== 'Todos'){
+            filtrado = data.filter((item)=> item.categoria === categoria);
         }
-       
-    },[categoria]);
+        if(busqueda.trim() !== ""){
+            filtrado = filtrado.filter((item)=>
+                item.idContenedor.toString().startsWith(busqueda)
+            );
+        }
+       setDataFiltrado(filtrado);
+    },[categoria,busqueda,data]);
     useEffect(()=>{
         axios.get('http://localhost:3000/api/contenedores/').then((response)=>{
             setData(response.data);
             setDataFiltrado(response.data);
+            setCargando(false);
         }).catch((error)=>{
             console.error('Error trayendo los contenedores:', error);
         });
@@ -51,6 +43,7 @@ function Contenedores(){
         }).catch((error)=>{ console.error('Error trayendo las categorias:', error);
         });
     },[]);
+    
     
     return(
         <div className='contenedores-container'>
@@ -71,15 +64,20 @@ function Contenedores(){
             <div style={{display:'flex', justifyContent:'space-between'}}>
                 <h2 className='titulo'>{categoria}</h2>
                 <input 
+                    type='text'
+                    value={busqueda}
+                    onChange={(e)=> setBusqueda(e.target.value)}
                     className='input-buscar'
                     placeholder="Buscar por id"
                 />
             </div>
-            {
-                dataFiltrado.length === 0 ? <NoItems nombre='contenedores' /> : dataFiltrado.map((item)=> (
-                    <Contenedor data={item} estado={categoria} />
-                ))
-            }
+            {cargando ? (
+                <p>Cargando datos...</p>
+            ) : dataFiltrado.length === 0 ? (
+                <NoItems nombre='contenedores' />
+            ) : (
+                dataFiltrado.map((item) => (<Contenedor key={item.idContenedor} data={item} estado={categoria} />)
+            ))}
             
             
         </div>

@@ -25,6 +25,7 @@ table, th, td {
     background-color: white;
     border-radius: 10px;
     border: 1px solid black;
+    padding: 5px;
 }
 .detalles-container{
     display: flex;
@@ -32,4 +33,7 @@ table, th, td {
     flex-wrap: wrap;
     
     justify-content: space-around;
+}
+.no-mostrar{
+    display: none;
 }

@@ -1,0 +1,10 @@
+.container-configuracion-usuarios{
+    display: flex;
+    justify-content: center; 
+    gap: 50px;
+}
+.container-lista-usuarios{
+    display: flex;
+    flex-direction: column;
+    
+}

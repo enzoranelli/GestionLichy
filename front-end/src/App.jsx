@@ -12,6 +12,7 @@ import Redireccion from "./components/Redireccion.jsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 import { useUserContext } from "./UserProvider.jsx";
 import ConfiguraciónUsuarios from "./pages/ConfiguracionUsuarios.jsx";
+
 function App() {
   const { user } = useUserContext();
 
@@ -38,8 +39,9 @@ function App() {
           <Route element={<ProtectedRoute roles={['admin','status']} isAllowed={user} />}>
             <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
             <Route path='/lista-productos' element={<ListaProductos />} />
-            <Route path='/producto-detalle' element={<ProductoDetalle />} />
+            <Route path='/producto-detalle/:producto' element={<ProductoDetalle />} />
             <Route path='/agregar-item/:item' element={<AgregarItem />} />
+          
           </Route>
           <Route element={<ProtectedRoute roles={['admin']} isAllowed={user} />}>
             <Route path='/configuracion-usuarios' element={<ConfiguraciónUsuarios />} />

@@ -1,8 +1,14 @@
+import axios from "axios";
+import { useState, useEffect } from "react";
+import ListaDeUsuarios from "../components/ListaDeUsarios";
+import CrearUsuario from "../components/CrearUsuario";
+import "../styles/ConfiguracionUsuarios.css";
 function ConfiguraciónUsuarios(){
-
+    const [usuarios, setUsuarios] = useState([]);
     return(
-        <div>
-            <h1>Configuración de usuarios</h1>
+        <div className="container-configuracion-usuarios">
+            <ListaDeUsuarios usuarios={usuarios} setUsuarios={setUsuarios} />
+            <CrearUsuario setUsuarios={setUsuarios}/>
         </div>
     );
 }

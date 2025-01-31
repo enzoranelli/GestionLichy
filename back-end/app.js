@@ -10,7 +10,7 @@ const items = require('./routes/items.js');
 const contendor = require('./routes/contenedor.js');
 const contendorEstado = require('./routes/contenedorEstado.js');
 const contenedorProducto = require('./routes/contenedorProducto.js');
-
+const producto = require('./routes/producto.js');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -25,6 +25,7 @@ app.use('/api/items',items);
 app.use('/api/contenedores',contendor); 
 app.use('/api/contenedorEstado',contendorEstado);
 app.use('/api/contenedorProducto',contenedorProducto);
+app.use('/api/producto',producto);
 module.exports = {
     app
 };
