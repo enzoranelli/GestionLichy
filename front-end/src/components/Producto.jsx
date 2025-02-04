@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import '../styles/Producto.css';
 import axios from 'axios';
-function Producto({producto, onActualizar}){
+import ConfirmarEliminar from './ConfirmarEliminar';
+function Producto({producto, onActualizar, setProducto}){
 
     const [mostrarForm, setMostrarForm ]= useState(false);
     const [colores, setColores] = useState([]);
@@ -70,6 +71,7 @@ function Producto({producto, onActualizar}){
                 <label>Color: <b>{producto.color || 'Sin color'}</b></label>
                 <label>Cantidad: <b>{producto.cantidad ? `${producto.cantidad} ${producto.unidad}`: 'Sin cantidad'}</b></label>
             </div>:
+                <>
                 <form className='datos-actuales-producto' onSubmit={onSubmit} >
                     <select name='idProducto' value={productoActualizado.idProducto || ''} onChange={handleInputChange}>
                             <option value=''>Seleccionar producto</option>
@@ -103,6 +105,8 @@ function Producto({producto, onActualizar}){
                     />
                 <button type='submit'>Actualizar</button>
             </form>
+            <ConfirmarEliminar id={producto.idContenedorProductos} tipo={'ContenedorProducto'} actualizarLista={setProducto} />
+            </>
             }
             
             <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button>

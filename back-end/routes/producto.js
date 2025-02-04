@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/dbconfig');
 
+router.delete('/:id',eliminarProducto);
 router.get('/sin-contenedor',obtenerProductosSinContenedor);
 router.get('/con-contenedor',obtenerProductosConContenedor);
 router.get('/cantidad-por-color/:id',obtenerCantidadPorColor);
@@ -29,7 +30,7 @@ async function obtenerProductosConContenedor(req,res){
 async function obtenerCantidadPorContenedor(req,res){
     try {
         const {id} = req.params;        
-        const [results] = await pool.promise().query('SELECT * FROM contenedorProductos WHERE producto = ?;',[id]);
+        const [results] = await pool.promise().query('SELECT * FROM contenedorProductos cp LEFT JOIN color c ON c.idColor = cp.color WHERE producto = ?;',[id]);
         res.json(results);
     } catch (error) {
         console.error('Error ejecutando la consulta:', error);
@@ -54,6 +55,22 @@ async function obtenerCantidadPorColor(req,res){
         GROUP BY p.idProducto, p.nombre, cp.color, cp.unidad;`;
         const [results] = await pool.promise().query(query,[id]);
         res.json(results);
+    }catch(error){
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+async function eliminarProducto(req,res){
+    try{
+        const {id} = req.params;
+        const connection = pool;
+        connection.query('DELETE FROM Producto WHERE idProducto = ?',[id],(err,results)=>{
+            if(err){
+                console.error('Error ejecutando la consulta:', err);
+                return res.status(500).send('Error en el servidor.');
+            }
+            res.json(results);
+        })
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');

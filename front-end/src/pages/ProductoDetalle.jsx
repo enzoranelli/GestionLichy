@@ -2,6 +2,7 @@ import '../styles/ProductoDetalle.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect,useState } from 'react';
 import axios from 'axios';
+import ConfirmarEliminar from '../components/ConfirmarEliminar';
 function ProductoDetalle(){
     const navigate = useNavigate();
 
@@ -60,6 +61,7 @@ function ProductoDetalle(){
                     <tr style={{width:'40%', background:'gray'}}>
                         <th>Contenedor</th>
                         <th>Cantidad</th>  
+                        <th>Color</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -67,14 +69,15 @@ function ProductoDetalle(){
                         cantidadPorContenedor.map((item, index)=>(
                             <tr key={index}>
                                 <th >{item.contenedor}</th>
-                                <th>{item.cantidad+' '+item.unidad}</th>
-                                <th>{item.color}</th>
-                                <td><button onClick={()=>redirigirContenedor(item.contenedor)}>Ver contenedor</button></td>
+                                <th>{item.cantidad ? `${item.cantidad} ${item.unidad}`: 'Sin cantidad'}</th>
+                                <th>{item.nombre ? item.nombre : 'Sin color'}</th>
+                                <td><button style={{width:'100%'}}onClick={()=>redirigirContenedor(item.contenedor)}>Ver contenedor</button></td>
                             </tr>
                         ))
                     }
                       </tbody>
                 </table>
+                <ConfirmarEliminar tipo={'producto'} id={producto}/>
             </div>
         </div>
     );

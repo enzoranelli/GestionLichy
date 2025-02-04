@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import ActualizarCategoria from '../components/ActualizarCategoria';
 import ActualizarEstado from '../components/ActualizarEstado';
 import ActualizarDetalles from './ActualizarDetalles';
+import ConfirmarEliminar from '../components/ConfirmarEliminar';
 function ContendorDetalle(){
     const navigate = useNavigate();
     const redirigir = (ruta)=>{
@@ -129,7 +130,20 @@ function ContendorDetalle(){
             }
             </div>
             <hr></hr>
-            <div className='encabezados-container'>
+            <div className='encabezados-container' >
+                <h3>Productos:</h3>
+                
+            </div>
+            <div className='productos-lista'>
+            {
+                productos ? productos.map((item)=> (
+                    <Producto key={item.idContenedorProductos} producto={item} onActualizar={actualizarProductoEnLista} setProducto={setProductos}/>
+                )) : <></>
+            }
+            </div>
+            
+           <hr></hr>
+           <div className='encabezados-container'>
                 <h2>Detalles</h2>
                 <button onClick={actualizarDetalles}>{mostrarActualizarDetalles ? 'Cancelar': 'Editar detalles'}</button>
             </div>
@@ -173,21 +187,11 @@ function ContendorDetalle(){
                     }
                     
                 </div>
-            
+                    
                 </>:<></>
             }
-           <hr></hr>
-            <div className='encabezados-container' >
-                <h3>Productos:</h3>
-                
-            </div>
-            <div className='productos-lista'>
-            {
-                productos ? productos.map((item)=> (
-                    <Producto key={item.idContenedorProductos} producto={item} onActualizar={actualizarProductoEnLista}/>
-                )) : <></>
-            }
-            </div>
+            <hr></hr>
+            <ConfirmarEliminar id={id} tipo={'contenedor'}/>
         </div>
     );
 }   

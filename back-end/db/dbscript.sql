@@ -44,8 +44,8 @@ CREATE TABLE Contenedor(
     factura varchar(100),
     vep VARCHAR(100),
     PRIMARY KEY(idContenedor),
-    FOREIGN KEY(proveedor) REFERENCES Proveedor(idProveedor),
-    FOREIGN KEY(categoria) REFERENCES categorias(nombreCategoria)
+    FOREIGN KEY(proveedor) REFERENCES Proveedor(idProveedor) ON DELETE SET NULL,
+    FOREIGN KEY(categoria) REFERENCES categorias(nombreCategoria)ON DELETE SET NULL
 );
 
 CREATE TABLE ContenedorEstado(
@@ -55,7 +55,7 @@ CREATE TABLE ContenedorEstado(
     ubicacion VARCHAR(200),
     fechaHora DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(idEstado),
-    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor)
+    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE
 );
 
 CREATE TABLE ContenedorProductos(
@@ -66,9 +66,9 @@ CREATE TABLE ContenedorProductos(
     unidad VARCHAR(100),
     color INT,
     PRIMARY KEY(idContenedorProductos),
-    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor),
-    FOREIGN KEY(producto) REFERENCES Producto(idProducto),
-    FOREIGN KEY(color) REFERENCES Color(idColor)
+    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE,
+    FOREIGN KEY(producto) REFERENCES Producto(idProducto) ON DELETE CASCADE,
+    FOREIGN KEY(color) REFERENCES Color(idColor) ON DELETE SET NULL
 );
 
 DROP TABLE ContenedorProductos;
@@ -81,3 +81,8 @@ DROP TABLE producto;
 DROP TABLE color;
 
 DROP TABLE usuario;
+
+
+
+
+

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import Permisos from "./Permisos";
 
 function CrearUsuario({ setUsuarios }) {
     const [formData, setFormData] = useState({
@@ -82,6 +83,7 @@ function CrearUsuario({ setUsuarios }) {
                         <option value="flujo">flujo</option>
                         <option value="status">status</option>
                     </select>
+                    <Permisos />
                 </div>
                 <button type="submit" style={{marginTop:"15px"}}>Crear Usuario</button>
             </form>

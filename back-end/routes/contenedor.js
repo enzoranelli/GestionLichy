@@ -4,9 +4,11 @@ const pool = require('../db/dbconfig');
 
 router.get('/',obtenerContenedores);
 router.post('/', agregarContenedor);
+router.delete('/:id',eliminarContenedor);
 router.get('/contenedor-detalle/:id',obtenerContenedorDetalle);
 router.put('/categoria/:id',actualizarContenedorCategoria);
 router.put('/detalle/:id',actualizarDetalleContenedor);
+
 async function obtenerContenedores(req,res){
     try {
         const [results] = await pool.promise().query('SELECT * FROM contenedor');
@@ -135,5 +137,20 @@ async function actualizarDetalleContenedor(req,res){
         return res.status(500).send('Error en el servidor.');
     }
 }
-
+async function eliminarContenedor(req,res){
+    try {
+        const id = req.params.id;
+        const connection = pool;
+        connection.query('DELETE FROM Contenedor WHERE idContenedor = ?',[id],(err,results)=>{
+            if(err){
+                console.error('Error ejecutando la consulta:', err);
+                return res.status(500).send('Error en el servidor.');
+            }
+            res.json(results)
+        })
+    } catch (error) {
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
 module.exports = router;
