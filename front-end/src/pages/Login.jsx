@@ -18,7 +18,7 @@ function Login(){
         const permisoVer = Object.keys(user.permisos).find(permiso => permiso.startsWith('Ver-'));
 
         // Si encuentra un permiso "Ver", redirige a la página correspondiente
-        if (permisoVer) {
+        if (permisoVer && permisoVer !== 'Ver-Items') {
             return <Navigate to={`/${permisoVer.toLowerCase()}`} />;
         }
 
