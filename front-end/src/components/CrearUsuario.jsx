@@ -1,7 +1,7 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Permisos from "./Permisos";
-
+import { permisosPredeterminados } from "../utils/getPermisos";
 function CrearUsuario({ setUsuarios }) {
     const [formData, setFormData] = useState({
         nombre: "",
@@ -9,7 +9,7 @@ function CrearUsuario({ setUsuarios }) {
         contrasena: "",
         tipoUsuario: "",
     });
-
+    const [permisos, setPermisos] = useState({})
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -17,8 +17,9 @@ function CrearUsuario({ setUsuarios }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const dataToSend = { ...formData, permisos };
         axios
-            .post("http://localhost:3000/api/usuarios/agregar", formData)
+            .post("http://localhost:3000/api/usuarios/agregar", dataToSend)
             .then(() => {
                 alert("Usuario creado exitosamente");
                 axios.get("http://localhost:3000/api/usuarios/test")
@@ -31,12 +32,19 @@ function CrearUsuario({ setUsuarios }) {
                 console.error(error);
             });
     };
-
+    useEffect(() => {
+        if (formData.tipoUsuario) {
+            setPermisos(permisosPredeterminados[formData.tipoUsuario] || {});
+        }
+    }, [formData.tipoUsuario]);
+    const setTipoUsuarioPersonalizado = () => {
+        setFormData((prev) => ({ ...prev, tipoUsuario: "personalizado" }));
+    };
     return (
         <div className="container-lista-usuarios">
             <h1>Crear Usuario</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
+            <form className='form-nuevo-usuario' onSubmit={handleSubmit}>
+                <div className='input-container-usuario'>
                     <label>Nombre:</label>
                     <br></br>
                     <input
@@ -47,7 +55,7 @@ function CrearUsuario({ setUsuarios }) {
                         required
                     />
                 </div>
-                <div>
+                <div className='input-container-usuario'>
                     <label>Email:</label>
                     <br></br>
                     <input
@@ -58,7 +66,7 @@ function CrearUsuario({ setUsuarios }) {
                         required
                     />
                 </div>
-                <div>
+                <div className='input-container-usuario'>
                     <label>Contraseña:</label>
                     <br></br>
                     <input
@@ -69,7 +77,7 @@ function CrearUsuario({ setUsuarios }) {
                         required
                     />
                 </div>
-                <div>
+                <div className='input-container-usuario'> 
                     <label>Tipo de Usuario:</label>
                     <br></br>
                     <select
@@ -78,12 +86,12 @@ function CrearUsuario({ setUsuarios }) {
                         onChange={handleChange}
                         required
                     >
-                        <option value="">Seleccione</option>
+                        <option value="personalizado">Personalizado</option>
                         <option value="admin">Admin</option>
                         <option value="flujo">flujo</option>
                         <option value="status">status</option>
                     </select>
-                    <Permisos />
+                    <Permisos permisos={permisos} setPermisos={setPermisos} setTipoUsuarioPersonalizado={setTipoUsuarioPersonalizado} />
                 </div>
                 <button type="submit" style={{marginTop:"15px"}}>Crear Usuario</button>
             </form>

@@ -15,8 +15,16 @@ function Login(){
         await login(email, contrasena);
     };
     if(user){
-        
-        return <Navigate to='/contenedores' />;
+        const permisoVer = Object.keys(user.permisos).find(permiso => permiso.startsWith('Ver-'));
+
+        // Si encuentra un permiso "Ver", redirige a la página correspondiente
+        if (permisoVer) {
+            return <Navigate to={`/${permisoVer.toLowerCase()}`} />;
+        }
+
+        // Si no tiene permisos de "Ver", redirige a la página de bienvenida por defecto
+        return <Navigate to='/bienvenido' />;
+       
     }
     return(
         <div className='contenedor-login'>

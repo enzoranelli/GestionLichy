@@ -19,7 +19,7 @@ function Navegador({user}){
           <ul style={{display:"flex",listStyleType:"none",padding:0,margin:0}}>
             
             <li style={{marginRight: "20px"}}>
-              <button className='boton-navegador' onClick={()=>redirigir('/contenedores')}>Contenedores</button>
+              <button className='boton-navegador' onClick={()=>redirigir('/ver-contenedores')}>Contenedores</button>
             </li>
             {
               user.tipoUsuario === 'admin' || user.tipoUsuario === 'status' ? <>
@@ -27,7 +27,7 @@ function Navegador({user}){
               <button className='boton-navegador' onClick={()=>redirigir('/nuevo-contenedor')}>Agregar Contenedor</button>
             </li>
             <li style={{marginRight: "20px"}}>
-              <button className='boton-navegador' onClick={()=>redirigir('/lista-productos')}>Lista de productos</button>
+              <button className='boton-navegador' onClick={()=>redirigir('/ver-productos')}>Lista de productos</button>
             </li>
             <li style={{ marginRight: "20px", position: "relative" }}>
               <button className="boton-navegador" onClick={toggleDropdown}>
@@ -36,17 +36,17 @@ function Navegador({user}){
               {isDropdownOpen && (
                 <ul className="dropdown-menu">
                   <li>
-                    <button className="boton-navegador" onClick={()=>redirigir('/agregar-item/producto')}>
+                    <button className="boton-navegador" onClick={()=>redirigir('/ver-items/producto')}>
                       Agregar producto
                     </button>
                   </li>
                   <li>
-                    <button className="boton-navegador" onClick={()=>redirigir('/agregar-item/color')}>
+                    <button className="boton-navegador" onClick={()=>redirigir('/ver-items/color')}>
                       Agregar Color
                     </button>
                   </li>
                   <li>
-                    <button className="boton-navegador" onClick={()=>redirigir('/agregar-item/proveedor')}>
+                    <button className="boton-navegador" onClick={()=>redirigir('/ver-items/proveedor')}>
                       Agregar Proveedor
                     </button>
                   </li>
@@ -59,7 +59,7 @@ function Navegador({user}){
             {
               user.tipoUsuario === 'admin' ? <>
               <li style={{marginRight: "20px"}}>
-              <button className='boton-navegador' onClick={()=>redirigir('/configuracion-usuarios')}>Configuración de usuarios</button> 
+              <button className='boton-navegador' onClick={()=>redirigir('/ver-usuarios')}>Configuración de usuarios</button> 
               </li>
               </>:
               <></>

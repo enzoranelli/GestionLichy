@@ -19,7 +19,12 @@ const UserProvider = ({ children }) => {
         try {
             const response = await axios.post('http://localhost:3000/api/usuarios/login', { email, contrasena });
             if(response.status === 200) {
-                setUser(response.data);
+                const userData = response.data;
+                if (typeof userData.permisos === "string") {
+                    userData.permisos = JSON.parse(userData.permisos);
+                }
+                setUser(userData);
+                
             }
         } catch (error) {
             if(error.response) {

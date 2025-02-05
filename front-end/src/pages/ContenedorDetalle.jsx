@@ -84,7 +84,7 @@ function ContendorDetalle(){
                         <button onClick={actualizarCategoria}>Cambiar categoria</button>
                     }
                          
-                    <button onClick={()=>redirigir('/contenedores')}>Volver</button> 
+                    <button onClick={()=>redirigir('/ver-contenedores')}>Volver</button> 
 
                 </div>
                 </>

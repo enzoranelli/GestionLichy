@@ -1,11 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-export function ProtectedRoute({children, isAllowed, roles}) {
-    if(!isAllowed) {
-         return <Navigate to="/" />;
-    }
-    if (roles.length > 0 && !roles.includes(isAllowed.tipoUsuario)) {
+export function ProtectedRoute({ children, user, requiredPermission}) {
+    if (!user) {
         return <Navigate to="/" />;
     }
+    const userPermissions = user.permisos || {};
+
+    if (!userPermissions[`Ver-${requiredPermission}`]) {
+        return <Navigate to="/bienvenido" />;
+    }
+
     return children ? children : <Outlet />;
 }

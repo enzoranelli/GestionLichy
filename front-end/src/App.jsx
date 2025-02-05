@@ -12,6 +12,7 @@ import Redireccion from "./components/Redireccion.jsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 import { useUserContext } from "./UserProvider.jsx";
 import ConfiguraciónUsuarios from "./pages/ConfiguracionUsuarios.jsx";
+import Bienvenido from "./pages/Bienvenido.jsx";
 
 function App() {
   const { user } = useUserContext();
@@ -30,21 +31,23 @@ function App() {
         
         <Routes>
           <Route path='/' element={<Login />} />
-          <Route element={<ProtectedRoute roles={['admin','flujo','status']} isAllowed={user} />}>
-            <Route path='/contenedores'  element={<Contenedores />} />
+          <Route path="/bienvenido" element={<Bienvenido />}/>
+          <Route element={<ProtectedRoute user={user} requiredPermission={'Contenedores'}/>}>
+            <Route path='/ver-contenedores'  element={<Contenedores />} />
             <Route path='/contenedor-detalle/:id' element={<ContendorDetalle />}/>
             <Route path='/redireccion' element={<Redireccion />} />
+            <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
            
           </Route> 
-          <Route element={<ProtectedRoute roles={['admin','status']} isAllowed={user} />}>
-            <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
-            <Route path='/lista-productos' element={<ListaProductos />} />
-            <Route path='/producto-detalle/:producto' element={<ProductoDetalle />} />
-            <Route path='/agregar-item/:item' element={<AgregarItem />} />
-          
+          <Route element={<ProtectedRoute user={user} requiredPermission={'Items'}/>}>
+            <Route path='/ver-items/:item' element={<AgregarItem />} />
           </Route>
-          <Route element={<ProtectedRoute roles={['admin']} isAllowed={user} />}>
-            <Route path='/configuracion-usuarios' element={<ConfiguraciónUsuarios />} />
+          <Route  element={<ProtectedRoute user={user} requiredPermission={'Productos'} />}>
+            <Route path='/ver-productos' element={<ListaProductos />} />
+            <Route path='/producto-detalle/:producto' element={<ProductoDetalle />} />
+          </Route>
+          <Route element={<ProtectedRoute user={user} requiredPermission={'Usuarios'} />}>
+            <Route path='/ver-usuarios' element={<ConfiguraciónUsuarios />} />
           </Route>
           <Route path='*' element={<h1>Not Found</h1>} />  
         </Routes>

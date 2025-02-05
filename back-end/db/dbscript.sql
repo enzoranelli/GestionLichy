@@ -7,6 +7,7 @@ CREATE TABLE Usuario(
     email VARCHAR(200) UNIQUE,
     contrasena VARCHAR(200),
     tipoUsuario VARCHAR(100),
+    permisos VARCHAR(500),
     PRIMARY KEY(idUsuario)
 );
 
