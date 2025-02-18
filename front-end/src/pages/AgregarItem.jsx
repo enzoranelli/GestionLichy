@@ -6,7 +6,7 @@ function AgregarItem(){
     const {item} = useParams();
     const [items, setItems] = useState([]);
     const [nombre, setNombre] = useState('');
-    
+    const [unidadPredeterminada, setUnidadPredeterminada] = useState('');
     useEffect(()=>{
         axios.get(`http://localhost:3000/api/items/${item}`).then((response)=>{
             setItems(response.data);
@@ -17,10 +17,11 @@ function AgregarItem(){
 
     const handleSubmit = (e) =>{
         e.preventDefault();
-        axios.post(`http://localhost:3000/api/items/${item}`,{nombre}).then((response)=>{
+        axios.post(`http://localhost:3000/api/items/${item}`,{nombre,unidadPredeterminada}).then((response)=>{
             if(response.status === 200){
                 console.log(response.data);
                 setNombre('');
+                setUnidadPredeterminada('');
                 setItems( [...items, response.data[0]]);
             }
         }).catch((error)=>{
@@ -34,6 +35,13 @@ function AgregarItem(){
                 <h2 className="titulo">Agregar {item}</h2>
                 <input style={{width:'100%'}} type="text" placeholder={`Nombre de ${item}`}  value={nombre} onChange={(e) => setNombre(e.target.value)}/>
                 <br></br>
+                {
+                    item === 'producto' ? <select style={{width:'100%'}} value={unidadPredeterminada} onChange={(e) => setUnidadPredeterminada(e.target.value)}>
+                        <option  value='' disabled>Seleccionar unidad</option>
+                        <option value='m'>m</option>
+                        <option value='kg'>kg</option>
+                    </select> : <></>
+                }
                 <button >Agregar</button>
             </form>
             <div className="lista-item-container">

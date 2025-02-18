@@ -11,7 +11,7 @@ async function obtenerProductoDeContenedor(req,res){
     try {
         const id = req.params.id;
         const query = `
-        SELECT  idContenedorProductos,p.nombre,p.idProducto, cp.cantidad, cp.unidad, c.nombre AS color, c.idColor FROM ContenedorProductos  cp JOIN Producto p ON cp.producto = p.idProducto 
+        SELECT  idContenedorProductos,p.nombre,p.idProducto, cp.cantidad, cp.unidad,cp.precioPorUnidad, c.nombre AS color, c.idColor FROM ContenedorProductos  cp JOIN Producto p ON cp.producto = p.idProducto 
         LEFT JOIN color c ON cp.color = c.idColor
         WHERE cp.contenedor = ?; `;
         const [results] = await pool.promise().query(query, [id]);

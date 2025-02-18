@@ -45,7 +45,7 @@ function ConfirmarEliminar({id,tipo,actualizarLista}){
         }
     }
     if(redireccionar){
-        let ruta = tipo === 'contenedor' ? '/contenedores' : '/ver-productos'
+        let ruta = tipo === 'contenedor' ? '/ver-contenedores' : '/ver-productos'
         return <Navigate to={ruta} />
     }
     return <button onClick={handleDelete} className="btn-delete">Eliminar</button>;

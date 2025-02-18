@@ -22,20 +22,20 @@ async function obtenerContenedores(req,res){
 async function agregarContenedor(req,res){
     try{
 
-        const { usuario,producto, proveedor,factura, codigoContenedor, forwarder,sira,vep } = req.body;
+        const { usuario,producto, proveedor,factura,comentario,unidad,cantidad,precioPorUnidad} = req.body;
         const connection = pool;
         console.log(req.body);
-        if(  !usuario || !proveedor || !producto){    
+        if(  !usuario || !proveedor || !unidad ||!factura || !cantidad || !precioPorUnidad ){    
             return res.status(400).send('Faltan campos obligatorios');
         }
         console.log("El valor de producto.value=",producto)
-        connection.query('INSERT INTO Contenedor ( usuario, proveedor,categoria,factura, codigoContenedor, forwarder,sira,vep) VALUES (?,?,?,?,?,?,?,?)',[ usuario, proveedor,'compra nueva',factura, codigoContenedor, forwarder,sira,vep],(err,results)=>{
+        connection.query('INSERT INTO Contenedor ( usuario, proveedor,categoria,factura,comentario) VALUES (?,?,?,?,?)',[ usuario, proveedor,'compra nueva',factura,comentario],(err,results)=>{
             if(err){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
             const idContenedor = results.insertId;
-            connection.query('INSERT INTO contenedorproductos (contenedor,producto) VALUES (?,?)',[idContenedor, parseInt(producto)],(err,results)=>{
+            connection.query('INSERT INTO contenedorproductos (contenedor,producto,unidad,cantidad,precioPorUnidad) VALUES (?,?,?,?,?)',[idContenedor, parseInt(producto),unidad,cantidad,precioPorUnidad],(err,results)=>{
                 if(err){
                     console.error('Error ejecutando la consulta:', err);
                     return res.status(500).send('Error en el servidor.');

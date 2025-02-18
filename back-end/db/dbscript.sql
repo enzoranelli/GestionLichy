@@ -73,7 +73,7 @@ CREATE TABLE ContenedorProductos(
     FOREIGN KEY(producto) REFERENCES Producto(idProducto) ON DELETE CASCADE,
     FOREIGN KEY(color) REFERENCES Color(idColor) ON DELETE SET NULL
 );
-
+/*
 DROP TABLE ContenedorProductos;
 DROP TABLE ContenedorEstado;
 DROP TABLE estados;
@@ -84,7 +84,7 @@ DROP TABLE producto;
 DROP TABLE color;
 
 DROP TABLE usuario;
-
+*/
 
 
 

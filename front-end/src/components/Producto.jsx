@@ -70,6 +70,8 @@ function Producto({user,producto, onActualizar, setProducto}){
                 <label><b>{producto.nombre}</b></label>
                 <label>Color: <b>{producto.color || 'Sin color'}</b></label>
                 <label>Cantidad: <b>{producto.cantidad ? `${producto.cantidad} ${producto.unidad}`: 'Sin cantidad'}</b></label>
+                <label>FOB: <b>${producto.precioPorUnidad}</b></label>
+                <label>Costo: <b>${(producto.precioPorUnidad*producto.cantidad).toFixed(2)}</b></label>
             </div>:
                 <>
                 <form className='datos-actuales-producto' onSubmit={onSubmit} >

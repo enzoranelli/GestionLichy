@@ -42,17 +42,24 @@ function Navegador({user}){
                 {isDropdownOpen && (
                   <ul className="dropdown-menu">
                     <li>
-                      <button className="boton-navegador" onClick={()=>redirigir('/ver-items/producto')}>
+                      <button className="boton-navegador" 
+                      onClick={()=>{redirigir('/ver-items/producto')
+                      toggleDropdown()
+                      }}>
                         Agregar producto
                       </button>
                     </li>
                     <li>
-                      <button className="boton-navegador" onClick={()=>redirigir('/ver-items/color')}>
+                      <button className="boton-navegador" onClick={()=>{redirigir('/ver-items/color')
+                         toggleDropdown()
+                      }}>
                         Agregar Color
                       </button>
                     </li>
                     <li>
-                      <button className="boton-navegador" onClick={()=>redirigir('/ver-items/proveedor')}>
+                      <button className="boton-navegador" onClick={()=>{redirigir('/ver-items/proveedor')
+                         toggleDropdown()
+                      }}>
                         Agregar Proveedor
                       </button>
                     </li>

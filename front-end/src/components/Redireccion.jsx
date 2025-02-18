@@ -7,7 +7,7 @@ function Redireccion(){
             <h1>Peticion exitosa</h1>
             <p>Se ha creado el contenedor exitosamente</p>
             <button onClick={()=>navigate('/nuevo-contenedor')}>Agregar otro contenedor</button>
-            <button onClick={()=>navigate('/contenedores')}>Ver contenedores</button>
+            <button onClick={()=>navigate('/ver-contenedores')}>Ver contenedores</button>
 
         </>
     )

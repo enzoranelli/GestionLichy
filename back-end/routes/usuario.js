@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../db/dbconfig');
 const {encriptarContrasena, verificarContrasena} = require('../utils/encriptacion.js');
 
-
+router.get('/primer-admin',primerAdmin)
 router.get('/test',obtenerUsuarios);
 router.post('/agregar',agregarUsuario);
 router.post('/login',login);
@@ -16,6 +16,46 @@ async function obtenerUsuarios(req,res){
         const [results] = await pool.promise().query('SELECT * FROM usuario');
         res.json(results);
     } catch (error) {
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+
+async function primerAdmin(req,res){
+    try{
+        const connection = pool;
+        const {nombre, email, contrasena, tipoUsuario, permisos} = {
+            nombre: 'admin',
+            email: 'admin@admin.com',
+            contrasena: 'admin',
+            tipoUsuario: 'admin',
+            permisos:{
+                "Ver-Contenedores": true,
+                "Editar-Contenedores": true,
+                "Crear-Contenedores": true,
+                "Ver-Items": true,
+                "Editar-Items": true,
+                "Crear-Items": true,
+                "Ver-Productos": true,
+                "Editar-Productos": true,
+                "Crear-Productos": true,
+                "Ver-Usuarios": true,
+                "Editar-Usuarios": true,
+                "Crear-Usuarios": true,
+            }
+        };
+        const permisosJSON = JSON.stringify(permisos);
+
+        const contraEncriptada = await encriptarContrasena(contrasena);
+        const query = 'INSERT INTO Usuario (nombre, email, contrasena, tipoUsuario,permisos) VALUES (?,?,?,?,?)';
+        connection.query(query,[nombre,email,contraEncriptada,tipoUsuario,permisosJSON],(err,results)=>{
+            if(err){
+                console.error('Error ejecutando la consulta:', err);
+                return res.status(500).send('Error en el servidor.');
+            }
+            res.json(results);
+        });
+    }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }

@@ -96,12 +96,12 @@ async function obtenerProductos(req,res){
 
 async function agregarProducto(req,res){    
     try{
-        const {nombre} = req.body;
+        const {nombre, unidadPredeterminada} = req.body;
         const connection = pool;
-        if(!nombre){
+        if(!nombre || !unidadPredeterminada){
             return res.status(400).send('Faltan campos obligatorios');
         }
-        connection.query('INSERT INTO Producto (nombre) VALUES (?)',[nombre],(err,results)=>{
+        connection.query('INSERT INTO Producto (nombre, unidadPredeterminada) VALUES (?,?)',[nombre,unidadPredeterminada],(err,results)=>{
             if(err){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');

@@ -13,6 +13,7 @@ function NuevoContenedor() {
     const [proveedores, setProveedores] = useState([]);
     const [productos, setProductos] = useState([]);
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+    const [unidad, setUnidad] = useState(null)
     const [redirigir, setRedirigir] = useState(false);
 
     // Obtener el valor actual del campo "producto"
@@ -23,9 +24,16 @@ function NuevoContenedor() {
         // Verificar si el producto seleccionado es nuevo (temporal)
         if (productoActual && productoActual.value.startsWith('temp-')) {
             // Si es un producto nuevo, guardarlo en el backend
+            alert('Unidad: ',unidad)
+            console.log(unidad)
+            if (!unidadActual) {
+                throw new Error('La unidad es un campo obligatorio para productos nuevos');
+            }
             try {
+                
                 const response = await axios.post('http://localhost:3000/api/items/producto', {
                     nombre: productoActual.label,
+                    unidadPredeterminada: unidad,
                 });
 
                 // Crear el nuevo producto con el ID real
@@ -49,7 +57,7 @@ function NuevoContenedor() {
                 // Redirigir después de enviar el formulario
                 setRedirigir(true);
             } catch (error) {
-                console.error('Error al guardar el nuevo producto:', error);
+                alert('Error al guardar el nuevo producto:', error);
             }
         } else {
             // Si es un producto existente, enviar el formulario directamente
@@ -157,46 +165,52 @@ function NuevoContenedor() {
                     )}
                 />
             </div>
-            {
-    productoSeleccionado && (
-        <>
-            <div className='input-container'>
-                        <label htmlFor='unidad'>Unidad:</label>
-                        <select
-                            {...register('unidad', { required: 'Seleccione una unidad' })}
-                            value={unidadActual} // Valor controlado
-                            disabled={!productoSeleccionado.value.startsWith('temp-')} // Deshabilitar si no es un producto nuevo
-                        >
-                            <option value='' disabled>
-                                Seleccionar unidad
-                            </option>
-                            <option value='m'>m</option>
-                            <option value='kg'>kg</option>
-                        </select>
+                {
+                    productoSeleccionado && (
+                        <>
+                    <label>Unidad:</label>
+                    <div className='input-container'>
+                        <Controller
+                            name='unidad'
+                            control={control}
+                            rules={{ required: 'Seleccione una unidad' }}
+                            render={({ field }) => (
+                                <select
+                                     {...field} 
+                                     onChange={(event)=>{
+                                        field.onChange(event); // Asegurar que react-hook-form maneja el cambio
+                                        setUnidad(event.target.value); // Actualizar el estado correctamente
+                                     } }// Usar el control de React Hook Form
+                                    disabled={!productoSeleccionado || !productoSeleccionado.value.startsWith('temp-')} // Deshabilitar si no es un producto nuevo
+                                 >
+                                    <option value='' disabled>
+                                        Seleccionar unidad
+                                    </option>
+                                    <option value='m'>m</option>
+                                    <option value='kg'>kg</option>
+                                </select>
+                        )}/>
                     </div>
                     <div className='input-container'>
                         <label htmlFor='cantidad'>Cantidad:</label>
                         <input {...register('cantidad')} />
                     </div>
+                    <div className='input-container'>
+                        <label htmlFor='fob'>FOB:</label>
+                        <input {...register('precioPorUnidad')} /> 
+                    </div>
         </>
-    )
-}
-            <div className='input-container'>
-                <label htmlFor='forwarder'>Agente:</label>
-                <input {...register('forwarder')} />
-            </div>
+                    )
+                }
+                
+    
+
+        
             <div className='input-container'>
                 <label htmlFor='comentario'>Item Proveedor:</label>
                 <input {...register('comentario')} />
             </div>
-            <div className='input-container'>
-                <label htmlFor='sira'>Sira:</label>
-                <input {...register('sira')} />
-            </div>
-            <div className='input-container'>
-                <label htmlFor='vep'>Vep:</label>
-                <input {...register('vep')} />
-            </div>
+            
             <button type='submit'>Agregar nuevo contenedor</button>
         </form>
     );
