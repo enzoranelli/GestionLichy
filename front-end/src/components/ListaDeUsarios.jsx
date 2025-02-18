@@ -18,6 +18,7 @@ function ListaDeUsuarios({ usuarios, setUsuarios }){
             <li key={index}>
                 <div>Email: {usuario.email}</div>
                 <div>Tipo de Usuario: {usuario.tipoUsuario}</div>
+                <div>Permisos: {usuario.permisos}</div>
             </li>
         ))}
         </ul>

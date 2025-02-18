@@ -20,6 +20,7 @@ CREATE TABLE Proveedor(
 CREATE TABLE Producto(
 	idProducto INT AUTO_INCREMENT,
     nombre VARCHAR(200),
+    unidadPredeterminada ENUM('m','kg'),
     PRIMARY KEY(idProducto)
 );
 
@@ -34,7 +35,7 @@ CREATE TABLE categorias(
 );
 
 CREATE TABLE Contenedor(
-	idContenedor INT,
+	idContenedor INT AUTO_INCREMENT,
     categoria VARCHAR(100),
     usuario INT,
     proveedor INT,
@@ -65,6 +66,7 @@ CREATE TABLE ContenedorProductos(
     producto INT,
     cantidad INT,
     unidad VARCHAR(100),
+    precioPorUnidad FLOAT,
     color INT,
     PRIMARY KEY(idContenedorProductos),
     FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE,

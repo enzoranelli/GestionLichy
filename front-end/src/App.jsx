@@ -34,7 +34,7 @@ function App() {
           <Route path="/bienvenido" element={<Bienvenido />}/>
           <Route element={<ProtectedRoute user={user} requiredPermission={'Contenedores'}/>}>
             <Route path='/ver-contenedores'  element={<Contenedores />} />
-            <Route path='/contenedor-detalle/:id' element={<ContendorDetalle />}/>
+            <Route path='/contenedor-detalle/:id'  element={<ContendorDetalle user={user}/>}/>
             <Route path='/redireccion' element={<Redireccion />} />
             <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
            

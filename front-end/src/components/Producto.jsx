@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import '../styles/Producto.css';
 import axios from 'axios';
 import ConfirmarEliminar from './ConfirmarEliminar';
-function Producto({producto, onActualizar, setProducto}){
+function Producto({user,producto, onActualizar, setProducto}){
 
     const [mostrarForm, setMostrarForm ]= useState(false);
     const [colores, setColores] = useState([]);
@@ -108,8 +108,9 @@ function Producto({producto, onActualizar, setProducto}){
             <ConfirmarEliminar id={producto.idContenedorProductos} tipo={'ContenedorProducto'} actualizarLista={setProducto} />
             </>
             }
-            
-            <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button>
+            {   user.permisos["Editar-Contenedores"] ?
+            <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button> :<></>
+            }
         </div>
         <hr className='linea-producto'></hr>
         </>

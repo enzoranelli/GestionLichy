@@ -33,19 +33,19 @@ function ConfirmarEliminar({id,tipo,actualizarLista}){
                     throw new Error('Error al eliminar el elemento');
                 }
                 Swal.fire('Eliminado', 'El elemento ha sido eliminado.', 'success');
-                if(tipo==='contendor' || tipo==='producto'){
+                if(tipo==='contenedor' || tipo==='producto'){
                     setRedireccionar(true);
                 }else{
                     actualizarLista((productos) => productos.filter((p) => p.idContenedorProductos !== id));
                 }
             }catch(error){
-                Swal.fire('Error', 'No se pudo eliminar el elemento', 'error');
+                Swal.fire('Error', 'No se pudo eliminar el elemento'+error, 'error');
             }
             
         }
     }
     if(redireccionar){
-        let ruta = tipo === 'contenedor' ? '/contenedores' : '/lista-productos'
+        let ruta = tipo === 'contenedor' ? '/contenedores' : '/ver-productos'
         return <Navigate to={ruta} />
     }
     return <button onClick={handleDelete} className="btn-delete">Eliminar</button>;

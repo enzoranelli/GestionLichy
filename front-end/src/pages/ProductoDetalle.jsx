@@ -9,7 +9,7 @@ function ProductoDetalle(){
     const {producto} = useParams();
     const [cantidadPorColor, setCantidadPorColor] = useState([]);
     const [cantidadPorContenedor, setCantidadPorContenedor] = useState([]);
-    const redirigir = () =>{navigate('/lista-productos')};
+    const redirigir = () =>{navigate('/ver-productos')};
     const redirigirContenedor = (contenedor)=>{navigate(`/contenedor-detalle/${contenedor}`)};
     useEffect(()=>{
         axios.get(`http://localhost:3000/api/producto/cantidad-por-color/${producto}`).then((response)=>{
@@ -33,7 +33,7 @@ function ProductoDetalle(){
                     <button onClick={redirigir}> Volver</button>
                 </div>
                 <hr></hr>
-                <h2 className='titulo'>Cantidad total: 1234</h2>
+                <h2 className='titulo'>Cantidad total: </h2>
                 <h2 className='titulo'>Cantidad por colores: </h2>
                 <table style={{width:'40%', background:'white',marginBottom:'20px',marginTop:'10px'}}>
                     <thead>
