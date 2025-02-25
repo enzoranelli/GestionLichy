@@ -7,6 +7,7 @@ import ActualizarCategoria from '../components/ActualizarCategoria';
 import ActualizarEstado from '../components/ActualizarEstado';
 import ActualizarDetalles from './ActualizarDetalles';
 import ConfirmarEliminar from '../components/ConfirmarEliminar';
+import AgregarProducto from '../components/AgregarProducto';
 function ContendorDetalle({user}){
     const navigate = useNavigate();
     const redirigir = (ruta)=>{
@@ -19,6 +20,7 @@ function ContendorDetalle({user}){
     const [data, setData]= useState(null);
     const [historial, setHistorial] = useState(null);
     const {id} = useParams();
+    const [agregarProducto, setAgregarProducto] = useState(false);
     const actualizarProductoEnLista = (productoActualizado) => {
         setProductos((productosPrevios) =>
             productosPrevios.map((producto) =>
@@ -135,13 +137,16 @@ function ContendorDetalle({user}){
             <hr></hr>
             <div className='encabezados-container' >
                 <h3>Productos:</h3>
-                
+                <button onClick={()=>setAgregarProducto(true)}> Agregar producto</button>
             </div>
             <div className='productos-lista'>
             {
                 productos ? productos.map((item)=> (
                     <Producto user={user} key={item.idContenedorProductos} producto={item} onActualizar={actualizarProductoEnLista} setProducto={setProductos}/>
                 )) : <></>
+            }
+            {
+                agregarProducto ? <AgregarProducto contenedor={id} setAgregarProducto={setAgregarProducto } actualizarLista={setProductos}/> : <></>
             }
             </div>
             

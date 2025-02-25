@@ -128,11 +128,11 @@ function NuevoContenedor() {
             
             <div className='input-container'>
                 <label htmlFor='factura'>Orden:</label>
-                <input {...register('factura')} />
+                <input className='input-nuevoContenedor' {...register('factura')} />
             </div>
             <div className='input-container'>
                 <label htmlFor='proveedor'>Agente:</label>
-                <select {...register('proveedor')}>
+                <select className='input-nuevoContenedor' {...register('proveedor')}>
                     <option value=''>Seleccione un agente</option>
                     {proveedores.map((item) => (
                         <option key={item.idProveedor} value={item.idProveedor}>
@@ -175,7 +175,8 @@ function NuevoContenedor() {
                             control={control}
                             rules={{ required: 'Seleccione una unidad' }}
                             render={({ field }) => (
-                                <select
+                                <select 
+                                    className='input-nuevoContenedor'
                                      {...field} 
                                      onChange={(event)=>{
                                         field.onChange(event); // Asegurar que react-hook-form maneja el cambio
@@ -193,24 +194,19 @@ function NuevoContenedor() {
                     </div>
                     <div className='input-container'>
                         <label htmlFor='cantidad'>Cantidad:</label>
-                        <input {...register('cantidad')} />
+                        <input type='number' className='input-nuevoContenedor' {...register('cantidad')} />
                     </div>
                     <div className='input-container'>
                         <label htmlFor='fob'>FOB:</label>
-                        <input {...register('precioPorUnidad')} /> 
+                        <input type='number' step='any' className='input-nuevoContenedor' {...register('precioPorUnidad')} /> 
                     </div>
         </>
                     )
                 }
-                
-    
-
-        
             <div className='input-container'>
                 <label htmlFor='comentario'>Item Proveedor:</label>
-                <input {...register('comentario')} />
+                <input className='input-nuevoContenedor' {...register('comentario')} />
             </div>
-            
             <button type='submit'>Agregar nuevo contenedor</button>
         </form>
     );

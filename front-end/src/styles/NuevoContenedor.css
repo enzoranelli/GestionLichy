@@ -13,3 +13,8 @@
     flex-direction: column;
     margin-bottom: 10px;
 }
+.input-nuevoContenedor{
+    padding: 2px;
+    height: 28px;
+    font-size: 17px;
+}

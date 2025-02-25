@@ -19,6 +19,7 @@ function Producto({user,producto, onActualizar, setProducto}){
             cantidad: productoActualizado.cantidad,
             unidad: productoActualizado.unidad,
             color: productoActualizado.idColor,
+            precioPorUnidad: productoActualizado.precioPorUnidad,
         };
 
         try {
@@ -38,6 +39,7 @@ function Producto({user,producto, onActualizar, setProducto}){
                     unidad: datosActualizados.unidad,
                     nombre: nombreProductoActualizado,
                     color: nombreColorActualizado,
+                    precioPorUnidad: datosActualizados.precioPorUnidad,
                 });
                 
                 setMostrarForm(false);
@@ -105,6 +107,7 @@ function Producto({user,producto, onActualizar, setProducto}){
                         value={productoActualizado.unidad || ''}
                         onChange={handleInputChange}
                     />
+                    <input type='number' name='precioPorUnidad' placeholder='Precio por unidad' value={productoActualizado.precioPorUnidad || ''} onChange={handleInputChange} />
                 <button type='submit'>Actualizar</button>
             </form>
             <ConfirmarEliminar id={producto.idContenedorProductos} tipo={'ContenedorProducto'} actualizarLista={setProducto} />
