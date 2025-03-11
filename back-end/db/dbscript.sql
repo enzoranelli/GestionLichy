@@ -21,6 +21,7 @@ CREATE TABLE Producto(
 	idProducto INT AUTO_INCREMENT,
     nombre VARCHAR(200),
     unidadPredeterminada ENUM('m','kg'),
+    codigoInterno INT UNIQUE,
     PRIMARY KEY(idProducto)
 );
 
@@ -34,6 +35,12 @@ CREATE TABLE categorias(
     PRIMARY KEY(nombreCategoria)
 );
 
+CREATE TABLE ubicacion(
+	nombreUbicacion VARCHAR(100),
+    estado VARCHAR(100),
+    FOREIGN KEY(estado) REFERENCES categorias(nombreCategoria) ON DELETE CASCADE,
+    PRIMARY KEY(nombreUbicacion)
+);
 CREATE TABLE Contenedor(
 	idContenedor INT AUTO_INCREMENT,
     categoria VARCHAR(100),
@@ -76,7 +83,7 @@ CREATE TABLE ContenedorProductos(
 
 DROP TABLE ContenedorProductos;
 DROP TABLE ContenedorEstado;
-DROP TABLE estados;
+DROP TABLE categorias;
 
 DROP TABLE contenedor;
 DROP TABLE proveedor;
@@ -84,8 +91,13 @@ DROP TABLE producto;
 DROP TABLE color;
 
 DROP TABLE usuario;
+DROP TABLE ubicacion;
 
+SELECT *  FROM PRODUCTO;
+ALTER TABLE ContenedorProductos 
+MODIFY COLUMN unidad ENUM('kg', 'm', 'uds');
+SELECT * FROM ubicacion;
+ALTER TABLE Producto
+MODIFY COLUMN unidadPredeterminada VARCHAR(10);
 
-
-
-
+DELETE FROM producto WHERE idProducto > 1;

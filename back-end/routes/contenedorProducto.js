@@ -49,10 +49,41 @@ async function agregarProductoDeContenedor(req,res){
     }
 }
 async function editarProductoDeContenedor(req,res){
+   const connection = pool;
+  
     try{
+     
         const id =req.params.id;
-        const {producto,cantidad,unidad,color,precioPorUnidad} = req.body;
-        const query = `UPDATE ContenedorProductos SET
+        const {producto,cantidad,unidad,color,contenedor,precioPorUnidad,coloresAsignados} = req.body;
+        console.log(coloresAsignados);
+        if (coloresAsignados && coloresAsignados.length > 0) {
+            for (const colorAsignado of coloresAsignados) {
+                const insertQuery = `
+                    INSERT INTO ContenedorProductos (contenedor, producto, cantidad, unidad, color, precioPorUnidad)
+                    VALUES (?, ?, ?, ?, ?, ?);
+                `;
+                await connection.promise().query(insertQuery, [
+                    contenedor, // contenedor (usamos el mismo contenedor)
+                    producto, // producto (el mismo producto)
+                    colorAsignado.cantidad, // cantidad asignada al color
+                    unidad, // unidad (la misma unidad)
+                    colorAsignado.color, // color asignado
+                    precioPorUnidad, // precio por unidad (el mismo)
+                ]);
+            }
+           
+        }      
+        if(cantidad === 0){
+            await connection.promise().query('DELETE FROM contenedorProductos WHERE idContenedorProductos = ? ',[id],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+                
+        })
+      
+        }else{
+            const query = `UPDATE ContenedorProductos SET
             producto = ?,
             cantidad = ?,
             unidad = ?,
@@ -60,15 +91,24 @@ async function editarProductoDeContenedor(req,res){
             precioPorUnidad=?
             WHERE idContenedorProductos = ?;
         `
-        const connection = pool;
-
-        connection.query(query,[producto,cantidad,unidad,color,precioPorUnidad,id],(err,results)=>{
-            if(err){
-                console.error('Error ejecutando la consulta:', err);
-                return res.status(500).send('Error en el servidor.');
-            }
-            res.json(results);
-        })
+            await connection.promise().query(query,[producto,cantidad,unidad,color,precioPorUnidad,id],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }        
+            })
+            obtenerProductos = true
+        } 
+        const consulta = ` SELECT c.idContenedorProductos, p.nombre, c.cantidad, c.unidad, c.precioPorUnidad, co.nombre AS color, co.idcolor
+        FROM ContenedorProductos c JOIN producto p ON c.producto = idProducto 
+        LEFT JOIN color co ON c.color = co.idColor 
+        WHERE contenedor = ?`
+        const [results]= await pool.promise().query(consulta, [contenedor]);
+        console.log(results);
+        res.json(results);
+        
+        
+        
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');

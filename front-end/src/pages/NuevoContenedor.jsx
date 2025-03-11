@@ -12,61 +12,10 @@ function NuevoContenedor() {
     const { register, handleSubmit, control, setValue, watch } = useForm();
     const [proveedores, setProveedores] = useState([]);
     const [productos, setProductos] = useState([]);
-    const [productoSeleccionado, setProductoSeleccionado] = useState(null);
-    const [unidad, setUnidad] = useState(null)
+    const [productosSeleccionados, setProductosSeleccionados] = useState([]);
     const [redirigir, setRedirigir] = useState(false);
-
-    // Obtener el valor actual del campo "producto"
-    const productoActual = watch('producto');
-    const unidadActual = watch('unidad');
-    // Enviar el formulario
-    const onSubmit = async (data) => {
-        // Verificar si el producto seleccionado es nuevo (temporal)
-        if (productoActual && productoActual.value.startsWith('temp-')) {
-            // Si es un producto nuevo, guardarlo en el backend
-            alert('Unidad: ',unidad)
-            console.log(unidad)
-            if (!unidadActual) {
-                throw new Error('La unidad es un campo obligatorio para productos nuevos');
-            }
-            try {
-                
-                const response = await axios.post('http://localhost:3000/api/items/producto', {
-                    nombre: productoActual.label,
-                    unidadPredeterminada: unidad,
-                });
-
-                // Crear el nuevo producto con el ID real
-                const newProduct = {
-                    value: response.data[0].idProducto.toString(),
-                    label: productoActual.label,
-                };
-
-                // Actualizar la lista de productos
-                setProductos((prev) =>
-                    prev.map((item) => (item.value === productoActual.value ? newProduct : item))
-                );
-
-                // Actualizar el valor del campo "producto" en el formulario
-                setValue('producto', newProduct);
-
-                // Enviar el formulario con el ID real del producto
-                const dataConUser = { ...data, usuario: user.idUsuario, producto: newProduct.value };
-                await axios.post('http://localhost:3000/api/contenedores', dataConUser);
-
-                // Redirigir después de enviar el formulario
-                setRedirigir(true);
-            } catch (error) {
-                alert('Error al guardar el nuevo producto:', error);
-            }
-        } else {
-            // Si es un producto existente, enviar el formulario directamente
-            const dataConUser = { ...data, usuario: user.idUsuario, producto: productoActual.value };
-            await axios.post('http://localhost:3000/api/contenedores', dataConUser);
-            setRedirigir(true);
-        }
-    };
-
+    const [unidadDeshabilitada, setUnidadDeshabilitada] = useState(false);
+    
     // Cargar datos iniciales
     useEffect(() => {
         axios.get('http://localhost:3000/api/items/proveedor')
@@ -89,38 +38,77 @@ function NuevoContenedor() {
             .catch((error) => {
                 console.error('Error trayendo los productos:', error);
             });
-
-        
     }, []);
-    useEffect(() => {
-        if (productoActual) {
-            const productoEncontrado = productos.find(
-                (item) => item.value === productoActual.value
-            );
 
-            if (productoEncontrado) {
-                // Si el producto tiene una unidad predeterminada, actualiza el campo de unidad
-                if (productoEncontrado.unidadPredeterminada) {
-                    setValue('unidad', productoEncontrado.unidadPredeterminada);
-                } else {
-                    // Si es un producto nuevo, restablece la unidad a un valor vacío
-                    setValue('unidad', '');
-                }
-            }
-        }
-    }, [productoActual, productos, setValue]);
     // Manejar la creación de nuevos productos
     const handleCreateProduct = (inputValue) => {
         const newOption = { value: `temp-${uuidv4()}`, label: inputValue };
         setProductos((prev) => [...prev, newOption]);
-        setProductoSeleccionado(newOption);
-        setValue('producto', newOption); // Actualizar el valor en react-hook-form
+        setValue('producto', newOption);
+        setUnidadDeshabilitada(false);
+        return newOption;
+    };
+    // Agregar uin producto a la lista
+    const agregarProducto = () => {
+        const productoActual = watch('producto');
+        const unidadActual = watch('unidad');
+        const cantidadActual = watch('cantidad');
+        const precioPorUnidadActual = watch('precioPorUnidad');
+
+        if (!productoActual || !unidadActual || !cantidadActual || !precioPorUnidadActual) {
+            alert('Todos los campos del producto son obligatorios');
+            return;
+        }
+
+        const nuevoProducto = {
+            idProducto: productoActual.value.startsWith('temp-') ? null : productoActual.value,
+            nombre: productoActual.label,
+            unidad: unidadActual,
+            cantidad: cantidadActual,
+            precioPorUnidad: precioPorUnidadActual,
+        };
+
+        setProductosSeleccionados((prev) => [...prev, nuevoProducto]);
+
+        // Limpiar los campos del producto
+        setValue('producto', null);
+        setValue('unidad', '');
+        setValue('cantidad', '');
+        setValue('precioPorUnidad', '');
+        setUnidadDeshabilitada(false); 
     };
 
+    const handleProductChange = (selectedOption) => {
+        if (selectedOption && !selectedOption.value.startsWith('temp-')) {
+            // Si el producto es existente, establecer la unidad predeterminada y deshabilitar el campo
+            const productoSeleccionado = productos.find(p => p.value === selectedOption.value);
+            setValue('unidad', productoSeleccionado.unidadPredeterminada);
+            setUnidadDeshabilitada(true);
+        } else {
+            // Si el producto es nuevo, habilitar el campo de unidad
+            setUnidadDeshabilitada(false);
+        }
+        setValue('producto', selectedOption);
+    };
+    // Enviar el formulario
+    const onSubmit = async (data) => {
+        const dataConUser = {
+            ...data,
+            usuario: user.idUsuario,
+            productos: productosSeleccionados,
+        };
+
+        try {
+            await axios.post('http://localhost:3000/api/contenedores', dataConUser);
+            setRedirigir(true);
+        } catch (error) {
+            alert('Error al enviar el formulario:', error);
+        }
+    };
+         
     if (redirigir) {
         return <Navigate to='/redireccion' />;
     }
-
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='nuevo-contenedor-container'>
             <h1 className='titulo'>Agregar contenedor</h1>
@@ -146,13 +134,13 @@ function NuevoContenedor() {
                 <Controller
                     name='producto'
                     control={control}
-                    rules={{ required: 'Campo obligatorio' }}
                     render={({ field }) => (
                         <CreatableSelect
                             {...field}
                             options={productos}
-                            onChange={(selectedOption) => {field.onChange(selectedOption)
-                                setProductoSeleccionado(selectedOption);
+                            onChange={(selectedOption) => {
+                                handleProductChange(selectedOption);
+                                field.onChange(selectedOption);
                             }}
                             onCreateOption={handleCreateProduct}
                             isClearable
@@ -165,44 +153,42 @@ function NuevoContenedor() {
                     )}
                 />
             </div>
-                {
-                    productoSeleccionado && (
-                        <>
-                    <label>Unidad:</label>
-                    <div className='input-container'>
-                        <Controller
-                            name='unidad'
-                            control={control}
-                            rules={{ required: 'Seleccione una unidad' }}
-                            render={({ field }) => (
-                                <select 
-                                    className='input-nuevoContenedor'
-                                     {...field} 
-                                     onChange={(event)=>{
-                                        field.onChange(event); // Asegurar que react-hook-form maneja el cambio
-                                        setUnidad(event.target.value); // Actualizar el estado correctamente
-                                     } }// Usar el control de React Hook Form
-                                    disabled={!productoSeleccionado || !productoSeleccionado.value.startsWith('temp-')} // Deshabilitar si no es un producto nuevo
-                                 >
-                                    <option value='' disabled>
-                                        Seleccionar unidad
-                                    </option>
-                                    <option value='m'>m</option>
-                                    <option value='kg'>kg</option>
-                                </select>
-                        )}/>
-                    </div>
-                    <div className='input-container'>
-                        <label htmlFor='cantidad'>Cantidad:</label>
-                        <input type='number' className='input-nuevoContenedor' {...register('cantidad')} />
-                    </div>
-                    <div className='input-container'>
-                        <label htmlFor='fob'>FOB:</label>
-                        <input type='number' step='any' className='input-nuevoContenedor' {...register('precioPorUnidad')} /> 
-                    </div>
-        </>
-                    )
-                }
+                
+            <div className='input-container'>
+              
+                <div className='input-container'>
+                    <label htmlFor='unidad'>Unidad:</label>
+                    <select className='input-nuevoContenedor' {...register('unidad')} disabled={unidadDeshabilitada}>
+                        <option value='' disabled>Seleccionar unidad</option>
+                        <option value='m'>m</option>
+                        <option value='kg'>kg</option>
+                        <option value='uds'>uds</option>
+                    </select>
+                </div>
+                <div className='input-container'>
+                    <label htmlFor='cantidad'>Cantidad:</label>
+                    <input type='number' className='input-nuevoContenedor' {...register('cantidad')} />
+                </div>
+                <div className='input-container'>
+                    <label htmlFor='fob'>FOB:</label>
+                    <input type='number' step='any' className='input-nuevoContenedor' {...register('precioPorUnidad')} /> 
+                </div>
+            </div>
+            <button type='button' onClick={agregarProducto}>
+                Agregar producto
+            </button>
+            {productosSeleccionados.length > 0 && (
+                <div className='productos-seleccionados'>
+                    <h3>Productos agregados:</h3>
+                    <ul>
+                        {productosSeleccionados.map((producto, index) => (
+                            <li key={index}>
+                                {producto.nombre} - {producto.cantidad} {producto.unidad} - ${producto.precioPorUnidad}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             <div className='input-container'>
                 <label htmlFor='comentario'>Item Proveedor:</label>
                 <input className='input-nuevoContenedor' {...register('comentario')} />

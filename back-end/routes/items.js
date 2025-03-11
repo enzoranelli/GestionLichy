@@ -9,7 +9,7 @@ router.post('/color',agregarColor);
 router.get('/producto',obtenerProductos);
 router.post('/producto',agregarProducto);
 router.get('/categorias',obtenerCategorias);
-
+router.post('/ubicaciones', obtenerUbicaciones);
 
 async function obtenerProveedores(req,res){
     try {
@@ -97,6 +97,7 @@ async function obtenerProductos(req,res){
 async function agregarProducto(req,res){    
     try{
         const {nombre, unidadPredeterminada} = req.body;
+        console.log(req.body);
         const connection = pool;
         if(!nombre || !unidadPredeterminada){
             return res.status(400).send('Faltan campos obligatorios');
@@ -131,5 +132,17 @@ async function obtenerCategorias(req,res) {
         return res.status(500).send('Error en el servidor.');
     }
     
+}
+
+async function obtenerUbicaciones(req,res){
+    try{
+        const { estado } = req.body;
+        const query = `SELECT * FROM ubicacion WHERE estado = ?`
+        const [results] = await pool.promise().query(query ,[estado]);
+        res.json(results);
+    } catch (error){
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
 }
 module.exports = router;

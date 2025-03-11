@@ -22,28 +22,41 @@ async function obtenerContenedores(req,res){
 async function agregarContenedor(req,res){
     try{
 
-        const { usuario,producto, proveedor,factura,comentario,unidad,cantidad,precioPorUnidad} = req.body;
+        const { usuario,productos, proveedor,factura,comentario} = req.body;
         const connection = pool;
-        console.log(req.body);
-        if(  !usuario || !proveedor || !unidad ||!factura || !cantidad || !precioPorUnidad ){    
+        
+        if(  !usuario || !proveedor ||!factura || !Array.isArray(productos) ){    
             return res.status(400).send('Faltan campos obligatorios');
         }
-        console.log("El valor de producto.value=",producto)
-        connection.query('INSERT INTO Contenedor ( usuario, proveedor,categoria,factura,comentario) VALUES (?,?,?,?,?)',[ usuario, proveedor,'compra nueva',factura,comentario],(err,results)=>{
-            if(err){
-                console.error('Error ejecutando la consulta:', err);
-                return res.status(500).send('Error en el servidor.');
-            }
-            const idContenedor = results.insertId;
-            connection.query('INSERT INTO contenedorproductos (contenedor,producto,unidad,cantidad,precioPorUnidad) VALUES (?,?,?,?,?)',[idContenedor, parseInt(producto),unidad,cantidad,precioPorUnidad],(err,results)=>{
-                if(err){
-                    console.error('Error ejecutando la consulta:', err);
-                    return res.status(500).send('Error en el servidor.');
-                }
-                res.json(results);
-            });
-        });
         
+        const [contenedorResult]= await connection.promise().query('INSERT INTO Contenedor ( usuario, proveedor,categoria,factura,comentario) VALUES (?,?,?,?,?)',[ usuario, proveedor,'COMPRADO',factura,comentario]);
+        const idContenedor = contenedorResult.insertId;
+        for(const producto of productos){
+            const {idProducto, nombre, unidad, cantidad, precioPorUnidad} = producto;
+            if(!unidad || !cantidad || !precioPorUnidad || (!idProducto && ! nombre)){
+                console.warn('Producto invalido:',producto)
+                continue;
+            }
+
+            let productoId;
+
+            if(idProducto){
+                const [productoExistente] = await connection.promise().query('SELECT idProducto FROM Producto WHERE idProducto = ?',[idProducto]);
+                if(productoExistente.length > 0){
+                    productoId = productoExistente[0].idProducto;
+                } else {
+                    console.warn('Producto no encontrado:', producto);
+                }
+            }else{ 
+                const [nuevoProducto] = await connection.promise().query('INSERT INTO Producto (nombre, unidadPredeterminada) VALUES (?,?)',[nombre,unidad]);
+                productoId = nuevoProducto.insertId;
+            }
+
+            await connection.promise().query('INSERT INTO ContenedorProductos (contenedor,producto,unidad,cantidad,precioPorUnidad) VALUES (?,?,?,?,?)',[idContenedor, productoId, unidad,cantidad,precioPorUnidad]);
+        }
+        await connection.promise().query('INSERT INTO ContenedorEstado (contenedor,estado,ubicacion) VALUES (?,?,?)',[idContenedor,'COMPRADO','FALTA DISPONER']);
+        res.json({success:true, idContenedor: idContenedor});
+       
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');

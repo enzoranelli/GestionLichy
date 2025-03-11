@@ -1,32 +1,48 @@
 import { useEffect, useState } from 'react';
 import '../styles/Producto.css';
 import axios from 'axios';
+import DesglozarPorcolor from './DesglozarPorColor';
 import ConfirmarEliminar from './ConfirmarEliminar';
-function Producto({user,producto, onActualizar, setProducto}){
+function Producto({user,producto, onActualizar, contenedor}){
 
     const [mostrarForm, setMostrarForm ]= useState(false);
     const [colores, setColores] = useState([]);
     const [productos, setProductos] = useState([]);
     const [productoActualizado, setProductoActualizado] = useState(producto);
+    const [coloresAsignados, setColoresAsignados] = useState([]);
+    const [cantidadRestante, setCantidadRestante] = useState(producto.cantidad);
     const cambiarNumero = ()=>{
         setMostrarForm(!mostrarForm);
     }
+    const handleColoresAsignadosChange = (nuevosColoresAsignados) => {
+        setColoresAsignados(nuevosColoresAsignados);
+        setProductoActualizado(prevState => ({
+            ...prevState,
+            idColor: nuevosColoresAsignados.length > 0 ? nuevosColoresAsignados[0].idColor : null
+        }));
+    };
+    const handleCantidadRestanteChange = (nuevaCantidadRestante) => {
+        setCantidadRestante(nuevaCantidadRestante);
+    };
     const onSubmit = async(e)=>{
         e.preventDefault();
+        
         const datosActualizados = {
         
             producto: productoActualizado.idProducto, // ID del producto
-            cantidad: productoActualizado.cantidad,
+            cantidad: cantidadRestante === 0 ? cantidadRestante : productoActualizado.cantidad,
             unidad: productoActualizado.unidad,
             color: productoActualizado.idColor,
             precioPorUnidad: productoActualizado.precioPorUnidad,
+            coloresAsignados: coloresAsignados,
+            contenedor: contenedor,
         };
-
+        console.log(coloresAsignados)
         try {
             const response = await axios.put(`http://localhost:3000/api/contenedorProducto/${producto.idContenedorProductos}`, datosActualizados);
             if (response.status === 200) {
                 
-
+                /*
                 const nombreProductoActualizado = productos.find(
                     (prod) => prod.idProducto === parseInt(datosActualizados.producto)
                 )?.nombre || 'Producto desconocido';
@@ -41,7 +57,9 @@ function Producto({user,producto, onActualizar, setProducto}){
                     color: nombreColorActualizado,
                     precioPorUnidad: datosActualizados.precioPorUnidad,
                 });
-                
+                */
+                console.log(response.data);
+                onActualizar(response.data);
                 setMostrarForm(false);
             }
         } catch (error) {
@@ -68,31 +86,36 @@ function Producto({user,producto, onActualizar, setProducto}){
         <>
         <div className='producto-container'>
             {
-                !mostrarForm ? <div className='datos-actuales-producto'>
-                <label><b>{producto.nombre}</b></label>
-                <label>Color: <b>{producto.color || 'Sin color'}</b></label>
-                <label>Cantidad: <b>{producto.cantidad ? `${producto.cantidad} ${producto.unidad}`: 'Sin cantidad'}</b></label>
-                <label>FOB: <b>${producto.precioPorUnidad}</b></label>
-                <label>Costo: <b>${(producto.precioPorUnidad*producto.cantidad).toFixed(2)}</b></label>
-            </div>:
+                !mostrarForm ? 
+                <div className='datos-actuales-producto'>
+                    <label><b>{producto.nombre}</b></label>
+                    <label>Color: <b>{producto.color || 'Sin color'}</b></label>
+                    <label>Cantidad: <b>{producto.cantidad ? `${producto.cantidad} ${producto.unidad}`: 'Sin cantidad'}</b></label>
+                    <label>FOB: <b>${producto.precioPorUnidad}</b></label>
+                    <label>Costo: <b>${(producto.precioPorUnidad*producto.cantidad).toFixed(2)}</b></label>
+                </div> :
                 <>
-                <form className='datos-actuales-producto' onSubmit={onSubmit} >
-                    <select name='idProducto' value={productoActualizado.idProducto || ''} onChange={handleInputChange}>
+                    <form className='datos-actuales-producto' onSubmit={onSubmit} >
+                        <select name='idProducto' value={productoActualizado.idProducto || ''} onChange={handleInputChange}>
                             <option value=''>Seleccionar producto</option>
                             {productos.map((prod) => (
                                 <option key={prod.idProducto} value={prod.idProducto}>
                                     {prod.nombre}
                                 </option>
                             ))}
-                    </select>
-                    <select name='idColor' value={productoActualizado.idColor || ''} onChange={handleInputChange}>
-                            <option value=''>Seleccionar color</option>
-                            {colores.map((color) => (
-                                <option key={color.idColor} value={color.idColor}>
-                                    {color.nombre}
-                                </option>
-                            ))}
-                    </select>
+                        </select>
+                        {
+                            // Si tiene color solo editarlo, si no tiene se puede desglozar la cantidad por colores
+                            productoActualizado.idColor ? <> 
+                                <select name='idColor' value={productoActualizado.idColor || ''} onChange={handleInputChange}>
+                                    <option value=''>Seleccionar color</option>
+                                        {colores.map((color) => (
+                                            <option key={color.idColor} value={color.idColor}>
+                                                {color.nombre}
+                                            </option>))}
+                                </select>
+                </>:    null}
+                   
                     <input
                         type='text'
                         name='cantidad'
@@ -110,13 +133,21 @@ function Producto({user,producto, onActualizar, setProducto}){
                     <input type='number' name='precioPorUnidad' placeholder='Precio por unidad' value={productoActualizado.precioPorUnidad || ''} onChange={handleInputChange} />
                 <button type='submit'>Actualizar</button>
             </form>
-            <ConfirmarEliminar id={producto.idContenedorProductos} tipo={'ContenedorProducto'} actualizarLista={setProducto} />
+            <ConfirmarEliminar id={producto.idContenedorProductos} tipo={'ContenedorProducto'} />
             </>
             }
             {   user.permisos["Editar-Contenedores"] ?
-            <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button> :<></>
+                <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button> :<></>
             }
         </div>
+        {
+            !productoActualizado.idColor && mostrarForm && <DesglozarPorcolor 
+            producto={producto} 
+            colores={colores}
+            onColoresAsignadosChange={handleColoresAsignadosChange}
+            onCantidadRestanteChange={handleCantidadRestanteChange}
+            />
+        }
         <hr className='linea-producto'></hr>
         </>
     );

@@ -21,22 +21,21 @@ function ContendorDetalle({user}){
     const [historial, setHistorial] = useState(null);
     const {id} = useParams();
     const [agregarProducto, setAgregarProducto] = useState(false);
-    const actualizarProductoEnLista = (productoActualizado) => {
-        setProductos((productosPrevios) =>
-            productosPrevios.map((producto) =>
-                producto.idContenedorProductos === productoActualizado.idContenedorProductos
-                    ? productoActualizado
-                    : producto
-            )
-        );
+    const actualizarProductoEnLista = (nuevaListaProductos) => {
+        setProductos(nuevaListaProductos);
     };
 
     const actualizarCategoria = ()=>{
         setMostrarActualizarCategoria(true);
     };
-    const actualizarEstado = ()=>{
+    const actualizarEstado = (estado)=>{
         if(mostrarActualizarEstado){
+            setData(prevData => ({
+                ...prevData,
+                categoria: estado
+            }));
             setMostrarActualizarEstado(false)
+
         }else{
             setMostrarActualizarEstado(true);
         }
@@ -72,20 +71,10 @@ function ContendorDetalle({user}){
                     <>
                     <> 
                         <h1 className='titulo' >Interno: {data.idContenedor}</h1>
-                        <h1 className='titulo'>Categoria: {data.categoria}</h1>
+                        <h1 className='titulo'>Estado: {data.categoria}</h1>
                     </>
                 <div>
-                    {
-                        mostrarActualizarCategoria ?
-                         <ActualizarCategoria 
-                            id={id} 
-                            setMostrarActualizarCategoria={setMostrarActualizarCategoria} 
-                            setData={setData}
-                            categoria={data.categoria}
-                            /> : 
-                        user.permisos["Editar-Contenedores"]  ? 
-                        <button onClick={actualizarCategoria}>Cambiar categoria</button> : <></>
-                    }
+                    
                          
                     <button onClick={()=>redirigir('/ver-contenedores')}>Volver</button> 
 
@@ -97,7 +86,7 @@ function ContendorDetalle({user}){
             
             <hr></hr>
             <div className='encabezados-container'>
-                <h1 className='titulo'>Estado: {historial && historial[0] ? historial[0].estado : 'Sin estado'}</h1>
+                <h1 className='titulo'>Fecha: {historial && historial[0] ? historial[0].fechaHora : 'Sin estado'}</h1>
                 <h1 className='titulo'>Ubicación: {historial && historial[0] ? historial[0].ubicacion : 'Sin ubicacion'}</h1>
                 {
                     mostrarActualizarEstado ? <button onClick={actualizarEstado}>Cancelar</button> : 
@@ -114,14 +103,15 @@ function ContendorDetalle({user}){
                 
                 <tr style={{width:'40%', background:'gray'}}>
                     <th>Estado</th>
-                    <th>Ubicación</th>          
+                    <th>Ubicación</th>
+                    <th>Fecha</th>          
                 </tr>
                 {
                     historial && historial.length > 1 ? historial.map((item)=>(
                         <tr>
                             <th>{item.estado}</th>
                             <th>{item.ubicacion}</th>
-                            
+                            <th>{item.fechaHora}</th>
                         </tr>
                     )):<>
                         <th>No hay estados anteriores</th>
@@ -131,7 +121,15 @@ function ContendorDetalle({user}){
         
             </table>
             {
-                mostrarActualizarEstado ? <ActualizarEstado setHistorial={setHistorial} contenedor={id} actualizarEstado={actualizarEstado}/> : <></>
+                mostrarActualizarEstado ? <ActualizarEstado
+                    setHistorial={setHistorial} 
+                    contenedor={id} 
+                    actualizarEstado={actualizarEstado}
+                    estad={ historial[0].estado}
+                    ubicacio={ historial[0].ubicacion}
+
+                    
+                    /> : <></>
             }
             </div>
             <hr></hr>
@@ -142,7 +140,7 @@ function ContendorDetalle({user}){
             <div className='productos-lista'>
             {
                 productos ? productos.map((item)=> (
-                    <Producto user={user} key={item.idContenedorProductos} producto={item} onActualizar={actualizarProductoEnLista} setProducto={setProductos}/>
+                    <Producto user={user} key={item.idContenedorProductos} producto={item} contenedor={id} onActualizar={actualizarProductoEnLista} setProducto={setProductos}/>
                 )) : <></>
             }
             {

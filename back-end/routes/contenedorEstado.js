@@ -5,6 +5,7 @@ const pool = require('../db/dbconfig');
 router.get('/:id',obtenerContenedorEstado);
 router.post('/',agregarContenedorEstado);
 
+
 async function obtenerContenedorEstado(req,res){
     try{
         const idContenedor = req.params.id;
@@ -25,6 +26,12 @@ async function agregarContenedorEstado(req,res){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
+            connection.query('UPDATE contenedor SET categoria = ? WHERE idContenedor = ?',[estado,contenedor],(err,results)=>{
+                if(err){
+                    console.error('Error ejecutando la consulta:', err);
+                    return res.status(500).send('Error en el servidor.');
+                }
+            })
             connection.query('SELECT * FROM ContenedorEstado WHERE contenedor = ? ORDER BY idEstado Desc',[contenedor],(err,results)=>{
                 if(err){
                     console.error('Error ejecutando la consulta:', err);
