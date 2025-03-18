@@ -5,6 +5,7 @@ function ActualizarEstado({setHistorial, contenedor, actualizarEstado,estad,ubic
     const [estado, setEstado] = useState(estad);
     const [ubicacion, setUbicacion] = useState('');
     const [estados, setEstados] = useState(null);
+    const [fechaManual, setFechaManual] = useState('');
     const [ubicaciones, setUbicaciones] = useState(null);
     useEffect(()=>{
         axios.get('http://localhost:3000/api/items/categorias').then((response)=>{
@@ -22,7 +23,7 @@ function ActualizarEstado({setHistorial, contenedor, actualizarEstado,estad,ubic
     },[estado]);
     const onSubmit = (e) =>{
         e.preventDefault();
-        axios.post('http://localhost:3000/api/contenedorEstado/',{contenedor,ubicacion,estado}).then((response)=>{
+        axios.post('http://localhost:3000/api/contenedorEstado/',{contenedor,ubicacion,estado,fechaManual}).then((response)=>{
             setHistorial(response.data);
             actualizarEstado(estado);
         }).catch((error)=>{
@@ -52,6 +53,8 @@ function ActualizarEstado({setHistorial, contenedor, actualizarEstado,estad,ubic
                     ))
                 }
             </select>
+            <lable>Fecha: </lable>
+            <input type='date' value={fechaManual} onChange={(e)=>{setFechaManual(e.target.value)}}/>
             <button >Cambiar estado</button>
         </form>
     );

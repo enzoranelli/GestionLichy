@@ -54,7 +54,7 @@ function NuevoContenedor() {
         const unidadActual = watch('unidad');
         const cantidadActual = watch('cantidad');
         const precioPorUnidadActual = watch('precioPorUnidad');
-
+        const itemProveedor = watch('item_proveedor');
         if (!productoActual || !unidadActual || !cantidadActual || !precioPorUnidadActual) {
             alert('Todos los campos del producto son obligatorios');
             return;
@@ -66,6 +66,7 @@ function NuevoContenedor() {
             unidad: unidadActual,
             cantidad: cantidadActual,
             precioPorUnidad: precioPorUnidadActual,
+            item_proveedor: itemProveedor
         };
 
         setProductosSeleccionados((prev) => [...prev, nuevoProducto]);
@@ -75,6 +76,7 @@ function NuevoContenedor() {
         setValue('unidad', '');
         setValue('cantidad', '');
         setValue('precioPorUnidad', '');
+        setValue('item_proveedor', '');
         setUnidadDeshabilitada(false); 
     };
 
@@ -173,10 +175,15 @@ function NuevoContenedor() {
                     <label htmlFor='fob'>FOB:</label>
                     <input type='number' step='any' className='input-nuevoContenedor' {...register('precioPorUnidad')} /> 
                 </div>
-            </div>
-            <button type='button' onClick={agregarProducto}>
+                <div className='input-container'>
+                    <label htmlFor='fob'>Item Proveedor:</label>
+                    <input type='text' step='any' className='input-nuevoContenedor' {...register('item_proveedor')} /> 
+                </div>
+                <button type='button' onClick={agregarProducto}>
                 Agregar producto
             </button>
+            </div>
+            
             {productosSeleccionados.length > 0 && (
                 <div className='productos-seleccionados'>
                     <h3>Productos agregados:</h3>
@@ -189,10 +196,7 @@ function NuevoContenedor() {
                     </ul>
                 </div>
             )}
-            <div className='input-container'>
-                <label htmlFor='comentario'>Item Proveedor:</label>
-                <input className='input-nuevoContenedor' {...register('comentario')} />
-            </div>
+          
             <button type='submit'>Agregar nuevo contenedor</button>
         </form>
     );

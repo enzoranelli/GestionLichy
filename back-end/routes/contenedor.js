@@ -32,7 +32,7 @@ async function agregarContenedor(req,res){
         const [contenedorResult]= await connection.promise().query('INSERT INTO Contenedor ( usuario, proveedor,categoria,factura,comentario) VALUES (?,?,?,?,?)',[ usuario, proveedor,'COMPRADO',factura,comentario]);
         const idContenedor = contenedorResult.insertId;
         for(const producto of productos){
-            const {idProducto, nombre, unidad, cantidad, precioPorUnidad} = producto;
+            const {idProducto, nombre, unidad, cantidad, precioPorUnidad,item_proveedor} = producto;
             if(!unidad || !cantidad || !precioPorUnidad || (!idProducto && ! nombre)){
                 console.warn('Producto invalido:',producto)
                 continue;
@@ -52,7 +52,7 @@ async function agregarContenedor(req,res){
                 productoId = nuevoProducto.insertId;
             }
 
-            await connection.promise().query('INSERT INTO ContenedorProductos (contenedor,producto,unidad,cantidad,precioPorUnidad) VALUES (?,?,?,?,?)',[idContenedor, productoId, unidad,cantidad,precioPorUnidad]);
+            await connection.promise().query('INSERT INTO ContenedorProductos (contenedor,producto,unidad,cantidad,precioPorUnidad,item_proveedor) VALUES (?,?,?,?,?,?)',[idContenedor, productoId, unidad,cantidad,precioPorUnidad,item_proveedor]);
         }
         await connection.promise().query('INSERT INTO ContenedorEstado (contenedor,estado,ubicacion) VALUES (?,?,?)',[idContenedor,'COMPRADO','FALTA DISPONER']);
         res.json({success:true, idContenedor: idContenedor});

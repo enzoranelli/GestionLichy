@@ -8,6 +8,7 @@ import ActualizarEstado from '../components/ActualizarEstado';
 import ActualizarDetalles from './ActualizarDetalles';
 import ConfirmarEliminar from '../components/ConfirmarEliminar';
 import AgregarProducto from '../components/AgregarProducto';
+import { fechaISOtoReadable } from '../utils/fecha';
 function ContendorDetalle({user}){
     const navigate = useNavigate();
     const redirigir = (ruta)=>{
@@ -86,7 +87,7 @@ function ContendorDetalle({user}){
             
             <hr></hr>
             <div className='encabezados-container'>
-                <h1 className='titulo'>Fecha: {historial && historial[0] ? historial[0].fechaHora : 'Sin estado'}</h1>
+                <h1 className='titulo'>Fecha asignada: {historial && historial[0] ? fechaISOtoReadable(historial[0].fechaManual) : 'Sin estado'}</h1>
                 <h1 className='titulo'>Ubicación: {historial && historial[0] ? historial[0].ubicacion : 'Sin ubicacion'}</h1>
                 {
                     mostrarActualizarEstado ? <button onClick={actualizarEstado}>Cancelar</button> : 
@@ -104,24 +105,25 @@ function ContendorDetalle({user}){
                 <tr style={{width:'40%', background:'gray'}}>
                     <th>Estado</th>
                     <th>Ubicación</th>
-                    <th>Fecha</th>          
+                    <th>Fecha asignada</th> 
+                    <th>Fecha de creacion</th>         
                 </tr>
                 {
-                    historial && historial.length > 1 ? historial.map((item)=>(
-                        <tr>
+                    historial && historial.length > 1 ? historial.slice(0, -1).map((item,index)=>(
+                        <tr key={index}>
                             <th>{item.estado}</th>
                             <th>{item.ubicacion}</th>
-                            <th>{item.fechaHora}</th>
+                            <th>{fechaISOtoReadable(item?.fechaManual)}</th>
+                            <th>{fechaISOtoReadable(item.fechaHora)}</th>    
                         </tr>
                     )):<>
                         <th>No hay estados anteriores</th>
-                    
                     </>
                 }
         
             </table>
             {
-                mostrarActualizarEstado ? <ActualizarEstado
+                mostrarActualizarEstado && historial ? <ActualizarEstado
                     setHistorial={setHistorial} 
                     contenedor={id} 
                     actualizarEstado={actualizarEstado}

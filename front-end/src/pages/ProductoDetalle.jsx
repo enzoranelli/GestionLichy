@@ -9,6 +9,10 @@ function ProductoDetalle(){
     const {producto} = useParams();
     const [cantidadPorColor, setCantidadPorColor] = useState([]);
     const [cantidadPorContenedor, setCantidadPorContenedor] = useState([]);
+    const [cantidadTotal, setCantidadTotal] = useState(0);
+    const [filtro, setFiltro] = useState('');
+    const [estados, setEstados] = useState([]);
+    const [ubicaciones, setUbicaciones] = useState([]);
     const redirigir = () =>{navigate('/ver-productos')};
     const redirigirContenedor = (contenedor)=>{navigate(`/contenedor-detalle/${contenedor}`)};
     useEffect(()=>{
@@ -24,6 +28,23 @@ function ProductoDetalle(){
         }).catch((error)=>{
             console.error("Error trayendo productos sin contenedor:", error);
         });
+        axios.get(`http://localhost:3000/api/producto/cantidad-total/${producto}`).then((response)=>{
+            console.log(response.data)
+            setCantidadTotal(response.data[0].cantidad_total)
+        }).catch((error)=>{
+            console.error("Error trayendo productos sin contenedor:", error);
+        });
+        axios.get('http://localhost:3000/api/items/categorias').then((response)=>{
+            setEstados(response.data);
+        }).catch((error)=>{
+            console.error("Error trayendo estados:", error);
+        });
+        axios.get('http://localhost:3000/api/items/ubicaciones').then((response)=>{ 
+            setUbicaciones(response.data);
+        }
+        ).catch((error)=>{
+            console.error("Error trayendo ubicaciones:", error);
+        });
     },[]);
     return(
         <div className='contenedor-producto-detalle'>
@@ -33,8 +54,32 @@ function ProductoDetalle(){
                     <button onClick={redirigir}> Volver</button>
                 </div>
                 <hr></hr>
-                <h2 className='titulo'>Cantidad total: </h2>
-                <h2 className='titulo'>Cantidad por colores: </h2>
+                <label>Filtrar:</label>
+                <select onChange={(e)=>setFiltro(e.target.value)}>
+                    <option value='color'>Color</option>
+                    <option value='ubicacion'>Ubicacion</option>
+                    <option value='estado'>Estado</option>
+                </select>
+                {
+                    filtro === 'estado' && estados ? 
+                        <select>
+                            {
+                                estados.map((item, index)=>(
+                                    <option key={index} value={item.nombreCategoria}>{item.nombreCategoria}</option>
+                                ))
+                            }
+                        </select> : filtro === 'ubicacion' && ubicaciones ? 
+                        <select>
+                            {
+                                ubicaciones.map((item, index)=>(
+                                    <option key={index} value={item.nombreUbicacion}>{item.nombreUbicacion}</option>
+                                ))
+                            }
+                        </select> : null
+                }
+                <button>Filtrar</button>
+                <h2 className='titulo'>Cantidad total: {cantidadTotal}  </h2>
+                <h2 className='titulo'>Cantidad por {filtro}: </h2>
                 <table style={{width:'40%', background:'white',marginBottom:'20px',marginTop:'10px'}}>
                     <thead>
                         <tr style={{ background: 'gray' }}>
@@ -44,12 +89,12 @@ function ProductoDetalle(){
                     </thead>
         	        <tbody>
                     {
-                        cantidadPorColor.map((item, index)=>(
+                        cantidadPorColor.length>=1 ? cantidadPorColor.map((item, index)=>(
                             <tr key={index}>
                                 <th >{item.nombreColor}</th>
                                 <th>{item.total_cantidad+' '+item.unidad}</th>
                             </tr>
-                        ))
+                        )) : <tr><th>No hay colores</th></tr>
                     }
                     </tbody>
                     
@@ -62,6 +107,7 @@ function ProductoDetalle(){
                         <th>Contenedor</th>
                         <th>Cantidad</th>  
                         <th>Color</th>
+                        <th>Item proveedor</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -71,6 +117,7 @@ function ProductoDetalle(){
                                 <th >{item.contenedor}</th>
                                 <th>{item.cantidad ? `${item.cantidad} ${item.unidad}`: 'Sin cantidad'}</th>
                                 <th>{item.nombre ? item.nombre : 'Sin color'}</th>
+                                <th>{item.item_proveedor ? item.item_proveedor : 'Sin item proveedor'}</th>
                                 <td><button style={{width:'100%'}}onClick={()=>redirigirContenedor(item.contenedor)}>Ver contenedor</button></td>
                             </tr>
                         ))

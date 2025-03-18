@@ -9,8 +9,8 @@ router.post('/color',agregarColor);
 router.get('/producto',obtenerProductos);
 router.post('/producto',agregarProducto);
 router.get('/categorias',obtenerCategorias);
-router.post('/ubicaciones', obtenerUbicaciones);
-
+router.post('/ubicaciones', obtenerUbicacionesPorEstado);
+router.get('/ubicaciones', obtenerUbicaciones);
 async function obtenerProveedores(req,res){
     try {
         const [results] = await pool.promise().query('SELECT * FROM proveedor');
@@ -134,13 +134,22 @@ async function obtenerCategorias(req,res) {
     
 }
 
-async function obtenerUbicaciones(req,res){
+async function obtenerUbicacionesPorEstado(req,res){
     try{
         const { estado } = req.body;
         const query = `SELECT * FROM ubicacion WHERE estado = ?`
         const [results] = await pool.promise().query(query ,[estado]);
         res.json(results);
     } catch (error){
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+async function obtenerUbicaciones(req,res){
+    try {
+        const [results] = await pool.promise().query('SELECT * FROM ubicacion');
+        res.json(results);
+    } catch (error) {
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }

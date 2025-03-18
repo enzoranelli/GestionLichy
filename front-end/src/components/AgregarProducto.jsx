@@ -72,6 +72,7 @@ function agregarProducto({setAgregarProducto,contenedor,actualizarLista}){
                 <option value='' disabled>Seleccionar unidad</option>
                 <option value='m'>m</option>
                 <option value='kg'>kg</option>
+                <option value='uni'>uni</option>
             </select>
             <button onClick={()=>setAgregarProducto(false)}>Cancelar</button>
             <button onClick={onSubmit}>Agregar Producto</button>

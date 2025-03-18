@@ -47,6 +47,7 @@ CREATE TABLE Contenedor(
     usuario INT,
     proveedor INT,
     comentario VARCHAR(300),
+    ubicacion VARCHAR(100),
     codigoContenedor VARCHAR(100),
     forwarder VARCHAR(100),
     sira VARCHAR(100),
@@ -74,6 +75,7 @@ CREATE TABLE ContenedorProductos(
     cantidad INT,
     unidad VARCHAR(100),
     precioPorUnidad FLOAT,
+    item_proveedor VARCHAR(200),
     color INT,
     PRIMARY KEY(idContenedorProductos),
     FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE,
@@ -92,7 +94,8 @@ DROP TABLE color;
 
 DROP TABLE usuario;
 DROP TABLE ubicacion;
-
+SELECT * FROM contenedorproductos;
+ALTER TABLE contenedorproductos ADD COLUMN item_proveedor VARCHAR(200);
 SELECT *  FROM PRODUCTO;
 ALTER TABLE ContenedorProductos 
 MODIFY COLUMN unidad ENUM('kg', 'm', 'uds');
@@ -101,3 +104,87 @@ ALTER TABLE Producto
 MODIFY COLUMN unidadPredeterminada VARCHAR(10);
 
 DELETE FROM producto WHERE idProducto > 1;
+
+INSERT INTO Categorias (nombreCategoria) VALUES
+('COMPRADO'),
+('EMBARCADO'),
+('ARRIBADO'),
+('DEPOSITO NACIONAL'),
+('EN STOCK'),
+('ENTREGADO'),
+('ANULADO');
+INSERT INTO Ubicacion (nombreUbicacion, estado) VALUES
+-- Estado COMPRADO
+('FALTA DISPONER', 'COMPRADO'),
+('DESARROLLO LD-SOFF', 'COMPRADO'),
+('LD-SOFF LLEGARON', 'COMPRADO'),
+('PRODUCCION', 'COMPRADO'),
+
+-- Estado EMBARCADO
+('BOOKING', 'EMBARCADO'),
+('EMBARCADO', 'EMBARCADO'),
+
+-- Estado ARRIBADO
+('TERMINAL', 'ARRIBADO'),
+('DF DASSA', 'ARRIBADO'),
+('DF LOGISTICA CENTRAL', 'ARRIBADO'),
+('PARA OFICIALIZAR', 'ARRIBADO'),
+('PARA OFICIALIZAR HOY', 'ARRIBADO'),
+('POR COORDINAR', 'ARRIBADO'),
+('COORDINADO', 'ARRIBADO'),
+
+-- Estado DEPOSITO NACIONAL
+('ALTITUD', 'DEPOSITO NACIONAL'),
+('MOREIRO', 'DEPOSITO NACIONAL'),
+('OPEN CARGO', 'DEPOSITO NACIONAL'),
+('LOGISTICA CENTRAL', 'DEPOSITO NACIONAL'),
+('ULOG', 'DEPOSITO NACIONAL'),
+('ALA', 'DEPOSITO NACIONAL'),
+
+-- Estado EN STOCK
+('MITRE', 'EN STOCK'),
+('LAVALLE', 'EN STOCK'),
+
+-- Estado ENTREGADO
+('ENTREGADO', 'ENTREGADO'),
+
+-- Estado ANULADO
+('ANULADO', 'ANULADO');
+
+SELECT * FROM producto;
+ALTER TABLE producto
+MODIFY COLUMN unidadPredeterminada ENUM('m','kg','uni');
+SELECT * FROM contenedorestado WHERE contenedor = 8;
+
+
+SELECT *
+FROM contenedorestado
+WHERE contenedor = ? 
+ORDER BY fechaHora DESC
+LIMIT 1;
+
+
+SELECT * FROM contenedorproductos cp JOIN contenedorestado ce ON cp.contenedor= ce.contenedor WHERE producto = 8;
+SELECT cp.*, ce.estado, ce.ubicacion, ce.fechaHora
+FROM contenedorproductos cp
+JOIN (
+    SELECT contenedor, estado, ubicacion, fechaHora
+    FROM contenedorestado
+    ORDER BY fechaHora DESC
+    LIMIT 1
+) ce ON cp.contenedor = ce.contenedor
+WHERE cp.producto = 8;
+
+SELECT * FROM contenedorestado ;
+
+SELECT * FROM contenedorproductos WHERE producto = 8;
+
+SELECT cp.*, ce.estado, ce.ubicacion, ce.fechaHora, ce.fechaManual
+FROM contenedorproductos cp
+JOIN contenedorestado ce ON cp.contenedor = ce.contenedor
+JOIN (
+    SELECT contenedor, MAX(fechaHora) AS max_fechaHora
+    FROM contenedorestado
+    GROUP BY contenedor
+) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
+WHERE cp.producto = 8;

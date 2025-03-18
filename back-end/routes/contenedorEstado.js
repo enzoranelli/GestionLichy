@@ -18,10 +18,10 @@ async function obtenerContenedorEstado(req,res){
 }
 async function agregarContenedorEstado(req,res){
     try{
-        const {contenedor, estado, ubicacion} = req.body;
+        const {contenedor, estado, ubicacion, fechaManual} = req.body;
         const connection = pool;
-        const query = 'INSERT INTO ContenedorEstado (contenedor, estado, ubicacion) VALUES (?,?,?)';
-        connection.query(query,[contenedor, estado, ubicacion],(err,results)=>{
+        const query = 'INSERT INTO ContenedorEstado (contenedor, estado, ubicacion, fechaManual) VALUES (?,?,?,?)';
+        connection.query(query,[contenedor, estado, ubicacion, fechaManual],(err,results)=>{
             if(err){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');

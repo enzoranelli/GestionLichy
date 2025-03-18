@@ -40,7 +40,7 @@ function AgregarItem(){
                         <option  value='' disabled>Seleccionar unidad</option>
                         <option value='m'>m</option>
                         <option value='kg'>kg</option>
-                        <option value='uds'>uds</option>
+                        <option value='uni'>uni</option>
                     </select> : <></>
                 }
                 <button >Agregar</button>

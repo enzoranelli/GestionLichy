@@ -123,13 +123,17 @@ function Producto({user,producto, onActualizar, contenedor}){
                         value={productoActualizado.cantidad || ''}
                         onChange={handleInputChange}
                     />
-                    <input
+                    <select
                         type='text'
                         name='unidad'
-                        placeholder='Unidad'
                         value={productoActualizado.unidad || ''}
                         onChange={handleInputChange}
-                    />
+                    >
+                        <option value='' disabled>Seleccionar unidad</option>
+                        <option value='m'>m</option>
+                        <option value='kg'>kg</option>
+                        <option value='uni'>uni</option>
+                    </select>
                     <input type='number' name='precioPorUnidad' placeholder='Precio por unidad' value={productoActualizado.precioPorUnidad || ''} onChange={handleInputChange} />
                 <button type='submit'>Actualizar</button>
             </form>
