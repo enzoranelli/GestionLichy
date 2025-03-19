@@ -112,4 +112,7 @@ async function obtenerCantidadPorEstado(req,res){
         return res.status(500).send('Error en el servidor.');
     }
 }
+function obtenerCantidadPorUbicacion(){
+    return 'hola';
+}
 module.exports = router;

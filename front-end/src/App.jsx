@@ -8,6 +8,7 @@ import ListaProductos from "./pages/ListaProductos.jsx";
 import ProductoDetalle from "./pages/ProductoDetalle.jsx";
 import AgregarItem from "./pages/AgregarItem.jsx";
 import Redireccion from "./components/Redireccion.jsx";
+import ActualizarProductos from "./pages/ActualizarProductos.jsx";
 
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 import { useUserContext } from "./UserProvider.jsx";
@@ -37,6 +38,7 @@ function App() {
             <Route path='/contenedor-detalle/:id'  element={<ContendorDetalle user={user}/>}/>
             <Route path='/redireccion' element={<Redireccion />} />
             <Route path='/nuevo-contenedor' element={<NuevoContenedor />} />
+            <Route path='actualizar-producto-contenedor/:id' element={<ActualizarProductos />}/>
            
           </Route> 
           <Route element={<ProtectedRoute user={user} requiredPermission={'Items'}/>}>

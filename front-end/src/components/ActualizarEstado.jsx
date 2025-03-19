@@ -54,7 +54,7 @@ function ActualizarEstado({setHistorial, contenedor, actualizarEstado,estad,ubic
                 }
             </select>
             <lable>Fecha: </lable>
-            <input type='date' value={fechaManual} onChange={(e)=>{setFechaManual(e.target.value)}}/>
+            <input type='date' value={fechaManual} onChange={(e)=>{setFechaManual(e.target.value)}} required/>
             <button >Cambiar estado</button>
         </form>
     );

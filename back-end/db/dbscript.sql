@@ -64,6 +64,7 @@ CREATE TABLE ContenedorEstado(
     estado VARCHAR(100),
     ubicacion VARCHAR(200),
     fechaHora DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fechaManual DATE DEFAULT (CURRENT_DATE()),
     PRIMARY KEY(idEstado),
     FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE
 );
@@ -91,14 +92,14 @@ DROP TABLE contenedor;
 DROP TABLE proveedor;
 DROP TABLE producto;
 DROP TABLE color;
-
+ALTER TABLE contenedorEstado ADD COLUMN fechaManual DATE DEFAULT (CURRENT_DATE()) ;
 DROP TABLE usuario;
 DROP TABLE ubicacion;
 SELECT * FROM contenedorproductos;
 ALTER TABLE contenedorproductos ADD COLUMN item_proveedor VARCHAR(200);
 SELECT *  FROM PRODUCTO;
 ALTER TABLE ContenedorProductos 
-MODIFY COLUMN unidad ENUM('kg', 'm', 'uds');
+MODIFY COLUMN unidad ENUM('kg', 'm', 'un');
 SELECT * FROM ubicacion;
 ALTER TABLE Producto
 MODIFY COLUMN unidadPredeterminada VARCHAR(10);

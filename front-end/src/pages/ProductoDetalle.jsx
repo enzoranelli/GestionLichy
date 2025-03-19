@@ -117,7 +117,7 @@ function ProductoDetalle(){
                                 <th >{item.contenedor}</th>
                                 <th>{item.cantidad ? `${item.cantidad} ${item.unidad}`: 'Sin cantidad'}</th>
                                 <th>{item.nombre ? item.nombre : 'Sin color'}</th>
-                                <th>{item.item_proveedor ? item.item_proveedor : 'Sin item proveedor'}</th>
+                                <th>{item.item_proveedor ? item.item_proveedor : '-'}</th>
                                 <td><button style={{width:'100%'}}onClick={()=>redirigirContenedor(item.contenedor)}>Ver contenedor</button></td>
                             </tr>
                         ))

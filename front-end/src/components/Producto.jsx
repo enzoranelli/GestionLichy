@@ -3,8 +3,9 @@ import '../styles/Producto.css';
 import axios from 'axios';
 import DesglozarPorcolor from './DesglozarPorColor';
 import ConfirmarEliminar from './ConfirmarEliminar';
+import { useNavigate } from 'react-router-dom';
 function Producto({user,producto, onActualizar, contenedor}){
-
+    const nav = useNavigate();
     const [mostrarForm, setMostrarForm ]= useState(false);
     const [colores, setColores] = useState([]);
     const [productos, setProductos] = useState([]);
@@ -13,6 +14,9 @@ function Producto({user,producto, onActualizar, contenedor}){
     const [cantidadRestante, setCantidadRestante] = useState(producto.cantidad);
     const cambiarNumero = ()=>{
         setMostrarForm(!mostrarForm);
+    }
+    const refirigir= () =>{
+        nav(`/actualizar-producto-contenedor/${producto.idContenedorProductos}`);
     }
     const handleColoresAsignadosChange = (nuevosColoresAsignados) => {
         setColoresAsignados(nuevosColoresAsignados);
@@ -42,22 +46,7 @@ function Producto({user,producto, onActualizar, contenedor}){
             const response = await axios.put(`http://localhost:3000/api/contenedorProducto/${producto.idContenedorProductos}`, datosActualizados);
             if (response.status === 200) {
                 
-                /*
-                const nombreProductoActualizado = productos.find(
-                    (prod) => prod.idProducto === parseInt(datosActualizados.producto)
-                )?.nombre || 'Producto desconocido';
-                const nombreColorActualizado = colores.find(
-                    (col) => col.idColor === parseInt(datosActualizados.color)
-                )?.nombre || 'Sin color';
-                onActualizar({
-                    ...producto,
-                    cantidad: datosActualizados.cantidad,
-                    unidad: datosActualizados.unidad,
-                    nombre: nombreProductoActualizado,
-                    color: nombreColorActualizado,
-                    precioPorUnidad: datosActualizados.precioPorUnidad,
-                });
-                */
+                
                 console.log(response.data);
                 onActualizar(response.data);
                 setMostrarForm(false);
@@ -142,7 +131,9 @@ function Producto({user,producto, onActualizar, contenedor}){
             }
             {   user.permisos["Editar-Contenedores"] ?
                 <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button> :<></>
+                
             }
+            <button onClick={()=>refirigir()}>Editar prueba</button>
         </div>
         {
             !productoActualizado.idColor && mostrarForm && <DesglozarPorcolor 

@@ -2,17 +2,32 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/dbconfig');
 
-
-router.get('/:id',obtenerProductoDeContenedor);
+router.get('/producto/:id',obtenerProductoContenedor);
+router.get('/:id',obtenerProductosDeContenedor);
 router.put('/:id',editarProductoDeContenedor);
 router.delete('/:id',eliminarProductoDeContenedor);
 router.post('/', agregarProductoDeContenedor);
 
-async function obtenerProductoDeContenedor(req,res){
+async function obtenerProductoContenedor(req,res){
+    try{
+        const id = req.params.id;
+        const query = `
+        SELECT  idContenedorProductos,p.nombre,p.idProducto, cp.cantidad, cp.unidad,cp.precioPorUnidad, c.nombre AS color,cp.contenedor, c.idColor FROM ContenedorProductos  cp JOIN Producto p ON cp.producto = p.idProducto 
+        LEFT JOIN color c ON cp.color = c.idColor
+        WHERE idContenedorProductos = ?; 
+        `
+        const [results] = await pool.promise().query(query, [id]);
+        res.json(results);
+    }catch(error){
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+async function obtenerProductosDeContenedor(req,res){
     try {
         const id = req.params.id;
         const query = `
-        SELECT  idContenedorProductos,p.nombre,p.idProducto, cp.cantidad, cp.unidad,cp.precioPorUnidad, c.nombre AS color, c.idColor FROM ContenedorProductos  cp JOIN Producto p ON cp.producto = p.idProducto 
+        SELECT  idContenedorProductos,p.nombre,p.idProducto, cp.cantidad, cp.unidad,cp.precioPorUnidad, c.nombre AS color,cp.contenedor, c.idColor FROM ContenedorProductos  cp JOIN Producto p ON cp.producto = p.idProducto 
         LEFT JOIN color c ON cp.color = c.idColor
         WHERE cp.contenedor = ?; `;
         const [results] = await pool.promise().query(query, [id]);
