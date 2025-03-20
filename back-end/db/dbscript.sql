@@ -84,6 +84,20 @@ CREATE TABLE ContenedorProductos(
     FOREIGN KEY(color) REFERENCES Color(idColor) ON DELETE SET NULL
 );
 
+CREATE TABLE ContenedorProductosHistorial (
+	idHistorial INT AUTO_INCREMENT,
+    idContenedorProductos INT,
+    contenedor INT,
+    tipoCambio ENUM('UPDATE','DELETE'),
+    cambios TEXT,
+    fechaCambio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    usuarioCambio INT,
+    motivo VARCHAR(500),
+    PRIMARY KEY(idHistorial),
+    FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE
+);
+
+
 DROP TABLE ContenedorProductos;
 DROP TABLE ContenedorEstado;
 DROP TABLE categorias;

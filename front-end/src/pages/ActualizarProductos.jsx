@@ -1,22 +1,39 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-
+import ConfirmarEliminar from "../components/ConfirmarEliminar";
+import DesglozarPorcolor from "../components/DesglozarPorColor";
+import { useUserContext } from "../UserProvider";
 function ActualizarProductos(){
+
+    const { user } = useUserContext();
     const {id} = useParams();
     const [contenedorProducto, setContendorProducto] = useState(null);
     const [colores, setColores] = useState([]);
     const [color, setColor] = useState(false);
     const [producto, setProducto] = useState(null);
     const [productos, setProductos] = useState([]);
+    const [motivo, setMotivo] = useState('');
+    const [cantidadRestante, setCantidadRestante] = useState(0);
+    const [coloresAsignados, setColoresAsignados] = useState([]);
+    const [dataAnterior, setDataAnterior] = useState(null);
     const nav = useNavigate();
+
     const volver = ()=>{
-        nav(`/contenedor-detalle/${contenedorProducto[0].contenedor}`);
+        nav(`/contenedor-detalle/${contenedorProducto.contenedor}`);
     }
+    const handleColoresAsignadosChange = (nuevosColoresAsignados) => {
+        setColoresAsignados(nuevosColoresAsignados);
+    };
+    const handleCantidadRestanteChange = (nuevaCantidadRestante) => {
+        setCantidadRestante(nuevaCantidadRestante);
+    };
     useEffect(()=>{
         axios.get(`http://localhost:3000/api/contenedorProducto/producto/${id}`).then((response)=>{
             console.log(response.data[0]);
             setContendorProducto(response.data[0]);
+            setDataAnterior(response.data[0]);
+            setCantidadRestante(response.data[0].cantidad);
             setColor(response.data[0].idColor);
             setProducto(response.data[0].idProducto);
            
@@ -36,21 +53,53 @@ function ActualizarProductos(){
         });
     },[]);
     useEffect(()=>{
-        axios.get
-    },[contenedorProducto]);
+        setProducto(productos.find((prod)=>prod.idProducto === contenedorProducto.idProducto));
+    },[productos]);
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setProductoActualizado({
-            ...productoActualizado,
+        setContendorProducto({
+            ...contenedorProducto,
             [name]: value,
         });
     };
+    const onSubmit = async(e)=>{
+        e.preventDefault();
+        
+        const datosActualizados = {
+        
+            producto: contenedorProducto.idProducto, // ID del producto
+            cantidad: cantidadRestante === 0 ? cantidadRestante : contenedorProducto.cantidad,
+            unidad: contenedorProducto.unidad,
+            color: contenedorProducto.idColor,
+            precioPorUnidad: contenedorProducto.precioPorUnidad,
+            coloresAsignados: coloresAsignados,
+            contenedor: contenedorProducto.contenedor,
+            item_proveedor: contenedorProducto.item_proveedor,
+            motivo:motivo,
+            dataAnterior: dataAnterior,
+            usuarioCambio: user.idUsuario,
+        };
+        console.log(coloresAsignados)
+        try {
+            const response = await axios.put(`http://localhost:3000/api/contenedorProducto/${contenedorProducto.idContenedorProductos}`, datosActualizados);
+            if (response.status === 200) {
+                
+                
+                console.log(response.data);
+                volver();
+           
+            }
+        } catch (error) {
+            console.error('Error al actualizar el producto:', error);
+            alert('Hubo un error al actualizar el producto.');
+        }
+    }
     return (
         <div className='nuevo-contenedor-container'>
             <button onClick={volver}>Volver</button>
             {
                 !contenedorProducto ? <p>Cargando...</p> :<>
-                <h1  className='titulo'> Actualizar (producto) de contendor {id}</h1>
+                <h1  className='titulo'> Actualizar {producto.nombre} de contendor {id}</h1>
                 <div className='input-container'>
                     <label>Producto:</label>
                     <select name='idProducto' value={contenedorProducto.idProducto || ''} onChange={handleInputChange}>
@@ -72,8 +121,12 @@ function ActualizarProductos(){
                             <option key={color.idColor} value={color.idColor}>
                                 {color.nombre}
                             </option>))}
-                    </select> : 
-                    <label>Desglozar por color</label>
+                    </select> : <DesglozarPorcolor 
+                                    producto={contenedorProducto} 
+                                    colores={colores}
+                                    onColoresAsignadosChange={handleColoresAsignadosChange}
+                                    onCantidadRestanteChange={handleCantidadRestanteChange}
+                                />
                 }
                 </div>
                 <div className='input-container'>
@@ -110,17 +163,20 @@ function ActualizarProductos(){
                 </div>
                 <div className='input-container'>
                     <label htmlFor='fob'>Item Proveedor:</label>
-                    <input type='text' name='item_proveedor'  value={contenedorProducto.item_proveedor || ''} /> 
+                    <input type='text' name='item_proveedor'  value={contenedorProducto.item_proveedor || ''}  onChange={handleInputChange}/> 
                 </div>
                 <div className='input-container'>
                     <label>Motivo de actualizacion:</label>
-                    <input></input>
+                    <input type='text' name='motivo' value={motivo} onChange={(e)=>{setMotivo(e.target.value)}}></input>
                 </div>
             </>
             }
            
             
-            <button>Actualizar</button>
+            <button onClick={onSubmit}>Actualizar</button>
+            
+            <ConfirmarEliminar id={id} tipo={'ContenedorProducto'} motivo={motivo}/>
+
         </div>
     );
 }
