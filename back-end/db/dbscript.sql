@@ -28,8 +28,10 @@ CREATE TABLE Producto(
 CREATE TABLE Color(
 	idColor INT AUTO_INCREMENT,
     nombre VARCHAR(100),
+    codigoInterno INT UNIQUE,
     PRIMARY KEY(idColor)
 );
+
 CREATE TABLE categorias(
 	nombreCategoria VARCHAR(100),
     PRIMARY KEY(nombreCategoria)
@@ -88,7 +90,7 @@ CREATE TABLE ContenedorProductosHistorial (
 	idHistorial INT AUTO_INCREMENT,
     idContenedorProductos INT,
     contenedor INT,
-    tipoCambio ENUM('UPDATE','DELETE'),
+    tipoCambio ENUM('UPDATE','DELETE','INSERT'),
     cambios TEXT,
     fechaCambio DATETIME DEFAULT CURRENT_TIMESTAMP,
     usuarioCambio INT,
@@ -101,7 +103,7 @@ CREATE TABLE ContenedorProductosHistorial (
 DROP TABLE ContenedorProductos;
 DROP TABLE ContenedorEstado;
 DROP TABLE categorias;
-
+DROP TABLE contenedorproductoshistorial;
 DROP TABLE contenedor;
 DROP TABLE proveedor;
 DROP TABLE producto;
@@ -178,7 +180,7 @@ WHERE contenedor = ?
 ORDER BY fechaHora DESC
 LIMIT 1;
 
-
+SELECT * FROM contenedorproductoshistorial;
 SELECT * FROM contenedorproductos cp JOIN contenedorestado ce ON cp.contenedor= ce.contenedor WHERE producto = 8;
 SELECT cp.*, ce.estado, ce.ubicacion, ce.fechaHora
 FROM contenedorproductos cp
@@ -203,3 +205,55 @@ JOIN (
     GROUP BY contenedor
 ) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
 WHERE cp.producto = 8;
+
+
+SELECT cp.*, ce.estado, ce.ubicacion, ce.fechaHora, ce.fechaManual,SUM(COALESCE(cp.cantidad, 0)) AS total_cantidad
+FROM contenedorproductos cp
+JOIN contenedorestado ce ON cp.contenedor = ce.contenedor
+JOIN (
+    SELECT contenedor, MAX(fechaHora) AS max_fechaHora
+    FROM contenedorestado
+    GROUP BY contenedor
+) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
+WHERE cp.producto = 1 
+group by cp.producto, cp.color, cp.unidad;
+
+SELECT 
+    cp.producto,
+    cp.color,
+    cp.unidad,
+    ce.estado,
+    ce.ubicacion,
+    SUM(COALESCE(cp.cantidad, 0)) AS total_cantidad
+FROM 
+    contenedorproductos cp
+JOIN 
+    contenedorestado ce ON cp.contenedor = ce.contenedor
+JOIN (
+    SELECT 
+        contenedor, 
+        MAX(fechaHora) AS max_fechaHora
+    FROM 
+        contenedorestado
+    GROUP BY 
+        contenedor
+) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
+WHERE 
+    cp.producto = 1
+GROUP BY 
+    cp.producto, 
+    cp.color, 
+    cp.unidad, 
+    ce.estado, 
+    ce.ubicacion;
+
+
+SELECT cp.*, ce.estado, ce.ubicacion, ce.fechaHora, ce.fechaManual
+FROM contenedorproductos cp
+JOIN contenedorestado ce ON cp.contenedor = ce.contenedor
+JOIN (
+    SELECT contenedor, MAX(fechaHora) AS max_fechaHora
+    FROM contenedorestado
+    GROUP BY contenedor
+) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
+WHERE cp.producto = 1 AND ce.estado LIKE '%';

@@ -24,6 +24,14 @@ function ActualizarProductos(){
     }
     const handleColoresAsignadosChange = (nuevosColoresAsignados) => {
         setColoresAsignados(nuevosColoresAsignados);
+
+        // Si no hay cantidad restante, actualiza la cantidad original a 0
+        if (cantidadRestante === 0) {
+            setContendorProducto((prev) => ({
+                ...prev,
+                cantidad: 0, // Actualiza la cantidad original a 0
+            }));
+        }
     };
     const handleCantidadRestanteChange = (nuevaCantidadRestante) => {
         setCantidadRestante(nuevaCantidadRestante);
@@ -169,13 +177,15 @@ function ActualizarProductos(){
                     <label>Motivo de actualizacion:</label>
                     <input type='text' name='motivo' value={motivo} onChange={(e)=>{setMotivo(e.target.value)}}></input>
                 </div>
+                <ConfirmarEliminar id={id} tipo={'ContenedorProducto'} motivo={motivo} usuario={user.idUsuario} contenedor={contenedorProducto.contenedor}/>
             </>
+
             }
            
             
             <button onClick={onSubmit}>Actualizar</button>
             
-            <ConfirmarEliminar id={id} tipo={'ContenedorProducto'} motivo={motivo}/>
+          
 
         </div>
     );

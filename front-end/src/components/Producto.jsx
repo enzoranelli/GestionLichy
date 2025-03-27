@@ -130,10 +130,10 @@ function Producto({user,producto, onActualizar, contenedor}){
             </>
             }
             {   user.permisos["Editar-Contenedores"] ?
-                <button onClick={cambiarNumero}>{mostrarForm ? 'Cancelar':'Editar'}</button> :<></>
+                <button onClick={()=>refirigir()}>Editar</button>:<></>
                 
             }
-            <button onClick={()=>refirigir()}>Editar prueba</button>
+            
         </div>
         {
             !productoActualizado.idColor && mostrarForm && <DesglozarPorcolor 

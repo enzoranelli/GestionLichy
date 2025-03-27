@@ -74,8 +74,9 @@ async function editarProductoDeContenedor(req,res){
         console.log(req.body);
         console.log(coloresAsignados);
         if (coloresAsignados && coloresAsignados.length > 0) {
+            let cambiosTexto = `Cambios: desglose de colores al producto: (${dataAnterior.nombre})\n`;
             for (const colorAsignado of coloresAsignados) {
-                const insertQuery = `
+                const insertQuery = ` 
                     INSERT INTO ContenedorProductos (contenedor, producto, cantidad, unidad, color, precioPorUnidad)
                     VALUES (?, ?, ?, ?, ?, ?);
                 `;
@@ -84,16 +85,30 @@ async function editarProductoDeContenedor(req,res){
                     producto, // producto (el mismo producto)
                     colorAsignado.cantidad, // cantidad asignada al color
                     unidad, // unidad (la misma unidad)
-                    colorAsignado.color, // color asignado
+                    parseInt(colorAsignado.color), // color asignado
                     precioPorUnidad, // precio por unidad (el mismo)
                 ]);
+                cambiosTexto += `(${colorAsignado.color}) -> cantidad: ${colorAsignado.cantidad}\n`;
             }
             
-            
-                
+            const sqlInsert = `
+            INSERT INTO ContenedorProductosHistorial (idContenedorProductos, contenedor, tipoCambio, cambios, usuarioCambio, motivo)
+            VALUES (?, ?, ?, ?, ?, ?);
+        `;
+       
+        await connection.promise().query(sqlInsert, [
+            id, // idContenedorProductos (usamos el ID original)
+            contenedor, // contenedor
+            'INSERT', // tipoCambio
+            cambiosTexto, // cambios (texto con el desglose de colores)
+            usuarioCambio, // usuarioCambio
+            motivo // motivo
+        ]);
+        if (cantidad === 0 && !color) {
+            await connection.promise().query('DELETE FROM ContenedorProductos WHERE idContenedorProductos = ?', [id]);
         }
-      
-        else{
+                
+        }else if(cantidad !== 0){
             const query = `UPDATE ContenedorProductos SET
             producto = ?,
             cantidad = ?,
@@ -121,16 +136,8 @@ async function editarProductoDeContenedor(req,res){
             const sqlInsert = `INSERT INTO ContenedorProductosHistorial (idContenedorProductos, contenedor, tipoCambio, cambios, usuarioCambio, motivo) VALUES (?, ?, ?, ?, ?, ?);`; 
             await connection.promise().query(sqlInsert, [id, contenedor, 'UPDATE', cambios, usuarioCambio, motivo]);
         } 
-        const consulta = ` SELECT c.idContenedorProductos, p.nombre, c.cantidad, c.unidad, c.precioPorUnidad, co.nombre AS color, co.idcolor
-        FROM ContenedorProductos c JOIN producto p ON c.producto = idProducto 
-        LEFT JOIN color co ON c.color = co.idColor 
-        WHERE contenedor = ?`
-        const [results]= await pool.promise().query(consulta, [contenedor]);
-        console.log(results);
-        res.json(results);
-        
-        
-        
+        res.status(200).send('Producto actualizado y registrado en el historial.');
+            
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
@@ -139,20 +146,34 @@ async function editarProductoDeContenedor(req,res){
 async function eliminarProductoDeContenedor(req,res){
     try{
         const id =req.params.id;
+        const motivo = req.headers['x-motivo'];
+        const usuarioCambio= req.headers['x-usuario'];
+        const contenedor = req.headers['x-contenedor'];
         const connection = pool;
-        connection.query('DELETE FROM contenedorProductos WHERE idContenedorProductos = ? ',[id],(err,results)=>{
+        if(!motivo){
+            return res.status(400).send('Falta el encabezado X-Motivo.');
+        }
+        const [results] = await connection.promise().query('SELECT * FROM contenedorProductos WHERE idContenedorProductos = ?',[id]);
+
+        await connection.promise().query('DELETE FROM contenedorProductos WHERE idContenedorProductos = ? ',[id],(err,results)=>{
             if(err){
                 console.error('Error ejecutando la consulta:', err);
                 return res.status(500).send('Error en el servidor.');
             }
-            res.json(results);
         })
+        const cambios = JSON.stringify(results[0]);
+
+        const sqlInsert = `INSERT INTO ContenedorProductosHistorial (idContenedorProductos, contenedor, tipoCambio, cambios, usuarioCambio, motivo) VALUES (?, ?, ?, ?, ?, ?);`;
+        
+        await connection.promise().query(sqlInsert, [id, contenedor, 'DELETE', cambios, usuarioCambio, motivo]);
+        console.log('MOTIVO :', motivo)
+        res.status(200).send('Producto eliminado y registrado en el historial.');
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }
 }
-module.exports = router;
+
 
 function generarTextoCambios(original, actualizado) {
     const cambios = {};
@@ -183,3 +204,4 @@ function generarTextoCambios(original, actualizado) {
     console.log(textoCambios);
     return textoCambios;
 }
+module.exports = router;

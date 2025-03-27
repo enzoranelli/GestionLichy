@@ -8,8 +8,8 @@ router.get('/con-contenedor',obtenerProductosConContenedor);
 router.get('/cantidad-por-color/:id',obtenerCantidadPorColor);
 router.get('/cantidad-por-contenedor/:id', obtenerCantidadPorContenedor);
 router.get('/cantidad-total/:id',obtenerCantidadTotal);
-router.get('/cantidad-por-estado/:id',obtenerCantidadPorEstado);
-router.get('/cantidad-por-ubicacion/:id',obtenerCantidadPorUbicacion);
+router.get('/cantidad-filtro/:id',obtenerCantidadPorFiltro);
+
 async function obtenerProductosSinContenedor(req,res){
     try {
         const [results] = await pool.promise().query('SELECT * FROM producto p LEFT JOIN contenedorproductos ON p.idProducto = producto WHERE producto IS NULL;');
@@ -91,28 +91,58 @@ async function obtenerCantidadTotal(req,res){
         return res.status(500).send('Error en el servidor.');
     }
 }
-async function obtenerCantidadPorEstado(req,res){
+async function obtenerCantidadPorFiltro(req,res){
     try{
         const id = req.params.id;
+        const filtro = req.headers['x-filtro'];
+        const estadoOUicacion = req.headers['x-estado-o-ubicacion']
+        let condicion = ''
+        
+        if (filtro === 'estado' || filtro === 'ubicacion') {
+            const valorFiltro = req.headers['x-filtro']; // Asume que el valor del filtro se envía en otro header
+            if (!valorFiltro) {
+                return res.status(400).send('Falta el valor del filtro.');
+            }
+            condicion = `AND ce.${filtro} LIKE ?`;
+        
+        }
+
         const query = `
         SELECT 
-           SELECT cp.*, ce.estado, ce.ubicacion, ce.fechaHora, ce.fechaManual
-            FROM contenedorproductos cp
-            JOIN contenedorestado ce ON cp.contenedor = ce.contenedor
-            JOIN (
-                SELECT contenedor, MAX(fechaHora) AS max_fechaHora
-                FROM contenedorestado
-                GROUP BY contenedor
-            ) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
-            WHERE cp.producto = ?;`;
-        const [results] = await pool.promise().query(query, [id]);
+            cp.producto,
+            cp.color,
+            cp.unidad,
+            ce.estado,
+            ce.ubicacion,
+            SUM(COALESCE(cp.cantidad, 0)) AS total_cantidad
+        FROM 
+            contenedorproductos cp
+        JOIN 
+            contenedorestado ce ON cp.contenedor = ce.contenedor
+        JOIN (
+            SELECT 
+                contenedor, 
+                MAX(fechaHora) AS max_fechaHora
+            FROM 
+                contenedorestado
+            GROUP BY 
+                contenedor
+        ) ultimo_estado ON ce.contenedor = ultimo_estado.contenedor AND ce.fechaHora = ultimo_estado.max_fechaHora
+        WHERE 
+            cp.producto = ? ${condicion}
+        GROUP BY 
+            cp.producto, 
+            cp.color, 
+            cp.unidad, 
+            ce.estado, 
+            ce.ubicacion;`;
+        
+        const [results] = await pool.promise().query(query, [id,estadoOUicacion]);
         res.json(results);
     }catch(error){
         console.error('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }
 }
-function obtenerCantidadPorUbicacion(){
-    return 'hola';
-}
+
 module.exports = router;

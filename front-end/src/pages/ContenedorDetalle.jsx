@@ -1,6 +1,6 @@
 import Producto from '../components/Producto';
 import '../styles/ContenedorDetalle.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import ActualizarCategoria from '../components/ActualizarCategoria';
@@ -9,11 +9,23 @@ import ActualizarDetalles from './ActualizarDetalles';
 import ConfirmarEliminar from '../components/ConfirmarEliminar';
 import AgregarProducto from '../components/AgregarProducto';
 import { fechaISOtoReadable } from '../utils/fecha';
+import VerHistorial from '../components/VerHistorial';
 function ContendorDetalle({user}){
     const navigate = useNavigate();
-    const redirigir = (ruta)=>{
-        navigate(ruta);
+    const redirigir = ()=>{
+       let ruta = ''
+        if(volver === 'contenedores'){
+            ruta = '/ver-contenedores'
+       }else{
+        ruta = `/producto-detalle/${producto}`
+       }
+       console.log(ruta)
+       navigate(ruta)
     }
+    const [searchParams] = useSearchParams();
+    const volver  = searchParams.get('volver');
+    const producto = searchParams.get('producto');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [mostrarActualizarEstado, setMostrarActualizarEstado] = useState(false);
     const [mostrarActualizarCategoria, setMostrarActualizarCategoria] = useState(false);
     const [mostrarActualizarDetalles, setMostrarActualizarDetalles] = useState(false);
@@ -26,6 +38,8 @@ function ContendorDetalle({user}){
         setProductos(nuevaListaProductos);
     };
 
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
     const actualizarCategoria = ()=>{
         setMostrarActualizarCategoria(true);
     };
@@ -77,7 +91,7 @@ function ContendorDetalle({user}){
                 <div>
                     
                          
-                    <button onClick={()=>redirigir('/ver-contenedores')}>Volver</button> 
+                    <button onClick={redirigir}>Volver</button> 
 
                 </div>
                 </>
@@ -149,7 +163,8 @@ function ContendorDetalle({user}){
                 agregarProducto ? <AgregarProducto contenedor={id} setAgregarProducto={setAgregarProducto } actualizarLista={setProductos}/> : <></>
             }
             </div>
-            
+            <button onClick={openModal}>Ver historial de cambios</button>          
+            <VerHistorial isOpen={isModalOpen} onRequestClose={closeModal} contenedor={id}></VerHistorial>  
            <hr></hr>
            <div className='encabezados-container'>
                 <h2>Detalles</h2>

@@ -2,7 +2,7 @@ import '../styles/Contenedor.css'
 import { useNavigate } from 'react-router-dom';
 function Contenedor({data, estado}){
     const navigate = useNavigate();
-    const redirigir = () => { navigate(`/contenedor-detalle/${data.idContenedor}`)}
+    const redirigir = () => { navigate(`/contenedor-detalle/${data.idContenedor}?volver=contenedores`)}
     return(
         <div className='contenedor-container'>
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>

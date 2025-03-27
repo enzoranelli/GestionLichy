@@ -5,18 +5,76 @@ const pool = require('../db/dbconfig');
 router.get('/proveedor',obtenerProveedores);
 router.post('/proveedor',agregarProveedor);
 router.get('/color',obtenerColores);
+router.put('/color/:id',actualizarColor);
 router.post('/color',agregarColor);
 router.get('/producto',obtenerProductos);
 router.post('/producto',agregarProducto);
+router.get('/producto/:id',buscarProducto);
+router.put('/producto/:id',actualizarProducto);
 router.get('/categorias',obtenerCategorias);
 router.post('/ubicaciones', obtenerUbicacionesPorEstado);
 router.get('/ubicaciones', obtenerUbicaciones);
+
 async function obtenerProveedores(req,res){
     try {
         const [results] = await pool.promise().query('SELECT * FROM proveedor');
         res.json(results);
     } catch (error) {
         console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+async function actualizarProducto(req,res){
+    try {
+        const {nombre, unidadPredeterminada, codigoInterno} = req.body;
+        const id = req.params.id;
+        const connection = pool;
+        
+        const [updateResults] = await connection.promise().query(
+            `UPDATE producto SET nombre = ?, unidadPredeterminada = ?, codigoInterno = ? WHERE idProducto = ?`,
+            [nombre, unidadPredeterminada, codigoInterno, id]
+        );
+
+        if (updateResults.affectedRows === 0) {
+            // Si no se actualizó ninguna fila, el producto no existe
+            return res.status(404).json({ mensaje: 'Producto no encontrado.' });
+        }
+
+        // Obtenemos el producto actualizado
+        const [productoActualizado] = await connection.promise().query(
+            `SELECT * FROM producto WHERE idProducto = ?`,
+            [id]
+        );
+
+        res.json(productoActualizado[0]); // Devolvemos el 
+    } catch (error) {
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+async function actualizarColor(req,res){
+    try{
+        const {nombre, codigoInterno} = req.body;
+        const id = req.params.id;
+        const connection = pool;
+        const [updateResults] = await connection.promise().query(
+            `UPDATE color SET nombre = ?, codigoInterno = ? WHERE idColor = ?`,
+            [nombre, codigoInterno, id]
+        );
+        res.json(updateResults);
+    }catch(error){
+        console.error('Error ejecutando la consulta:', error);
+        return res.status(500).send('Error en el servidor.');
+    }
+}
+
+async function buscarProducto(req,res){
+    try{
+        const id = req.params.id;
+        const [results] = await pool.promise().query('SELECT * FROM producto WHERE idProducto = ?',[id]);
+        res.json(results[0]);
+    }catch(error){
+        console.log('Error ejecutando la consulta:', error);
         return res.status(500).send('Error en el servidor.');
     }
 }
