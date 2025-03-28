@@ -22,9 +22,10 @@ CREATE TABLE Producto(
     nombre VARCHAR(200),
     unidadPredeterminada ENUM('m','kg'),
     codigoInterno INT UNIQUE,
+    tipoBultoPredeterminado ENUM('rollos','cajas'),
     PRIMARY KEY(idProducto)
 );
-
+ALTER TABLE Producto ADD COLUMN tipoBultoPredeterminado ENUM('rollos','cajas');
 CREATE TABLE Color(
 	idColor INT AUTO_INCREMENT,
     nombre VARCHAR(100),
@@ -80,11 +81,16 @@ CREATE TABLE ContenedorProductos(
     precioPorUnidad FLOAT,
     item_proveedor VARCHAR(200),
     color INT,
+    cantidadBulto INT,
     PRIMARY KEY(idContenedorProductos),
+    tipoBulto ENUM ('rollos','cajas'),
     FOREIGN KEY(contenedor) REFERENCES Contenedor(idContenedor) ON DELETE CASCADE,
     FOREIGN KEY(producto) REFERENCES Producto(idProducto) ON DELETE CASCADE,
     FOREIGN KEY(color) REFERENCES Color(idColor) ON DELETE SET NULL
 );
+
+ALTER TABLE ContenedorProductos MODIFY COLUMN cantidadBulto INT;
+ALTER TABLE ContenedorProductos ADD COLUMN tipoBulto ENUM ('rollos','cajas');
 
 CREATE TABLE ContenedorProductosHistorial (
 	idHistorial INT AUTO_INCREMENT,

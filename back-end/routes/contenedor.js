@@ -32,8 +32,8 @@ async function agregarContenedor(req,res){
         const [contenedorResult]= await connection.promise().query('INSERT INTO Contenedor ( usuario, proveedor,categoria,factura,comentario) VALUES (?,?,?,?,?)',[ usuario, proveedor,'COMPRADO',factura,comentario]);
         const idContenedor = contenedorResult.insertId;
         for(const producto of productos){
-            const {idProducto, nombre, unidad, cantidad, precioPorUnidad,item_proveedor} = producto;
-            if(!unidad || !cantidad || !precioPorUnidad || (!idProducto && ! nombre)){
+            const {idProducto, nombre, unidad, cantidad, cantidadBulto, tipoBulto, precioPorUnidad,item_proveedor} = producto;
+            if(!unidad || !cantidad||!cantidadBulto||!tipoBulto || !precioPorUnidad || (!idProducto && ! nombre)){
                 console.warn('Producto invalido:',producto)
                 continue;
             }
@@ -48,11 +48,11 @@ async function agregarContenedor(req,res){
                     console.warn('Producto no encontrado:', producto);
                 }
             }else{ 
-                const [nuevoProducto] = await connection.promise().query('INSERT INTO Producto (nombre, unidadPredeterminada) VALUES (?,?)',[nombre,unidad]);
+                const [nuevoProducto] = await connection.promise().query('INSERT INTO Producto (nombre, unidadPredeterminada, tipoBultoPredeterminado) VALUES (?,?)',[nombre,unidad,tipoBulto]);
                 productoId = nuevoProducto.insertId;
             }
 
-            await connection.promise().query('INSERT INTO ContenedorProductos (contenedor,producto,unidad,cantidad,precioPorUnidad,item_proveedor) VALUES (?,?,?,?,?,?)',[idContenedor, productoId, unidad,cantidad,precioPorUnidad,item_proveedor]);
+            await connection.promise().query('INSERT INTO ContenedorProductos (contenedor,producto,unidad,cantidad,precioPorUnidad,tipoBulto, cantidadBulto,item_proveedor) VALUES (?,?,?,?,?,?)',[idContenedor, productoId, unidad,cantidad,precioPorUnidad,tipoBulto,cantidadBulto,item_proveedor]);
         }
         await connection.promise().query('INSERT INTO ContenedorEstado (contenedor,estado,ubicacion) VALUES (?,?,?)',[idContenedor,'COMPRADO','FALTA DISPONER']);
         res.json({success:true, idContenedor: idContenedor});
